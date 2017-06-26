@@ -154,6 +154,35 @@ class JSCalendar {
         this.render();
     }
 
+    push(item) {
+        this.fire('willPush', item);
+        let date = new Date(item.at);
+
+        if (date.getMonth() == this.state.month && date.getFullYear() == this.state.year) {
+            let monthStat = JSCalendar.getDaysInMonth(this.state.year, this.state.month);
+            let startAt = monthStat.firstDay;
+
+            let index = date.getDate() + startAt - 1;
+            let row = Math.floor(index / 7);
+            let col = index % 7;
+
+            let arr = this.state.matrix[row][col];
+            if (!arr) {
+                arr = [];
+                this.state.matrix[row][col] = arr;
+            }
+
+            arr.push(item);
+            this.render();
+
+            this.fire('pushed', item);
+        } else {
+            this.fire("didNotPush", item);
+        }
+
+        return this;
+    }
+
     on(event, callback) {
         this.hooks[event] = this.hooks[event] || [];
         this.hooks[event].push(callback);

@@ -24,8 +24,11 @@
 
             var today = new Date();
 
-            var calendar = new JSCalendar(document.getElementById('test-instance'));
+            var calendar = new JSCalendar(document.getElementById('test-instance'), {
+                
+            });
             calendar.init();
+
             calendar.on('willRender', function() {
                 if (calendar.state.month == today.getMonth()) {
                     calendar.setMatrix({
