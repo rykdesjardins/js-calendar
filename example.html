@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="./dev/js-calendar.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <h1>JS Calendar</h1>
+        <hr />
+
+        <div id="test-instance" class="js-calendar">
+
+        </div>
+
+        <div id="errorWrapper" style="color:#999;">
+            No uncaught error!
+        </div>
+
+        <script src="./dev/debug.js"></script>
+        <script src="./dev/js-calendar.js"></script>
+        <script>
+            JSCalendar.on('new', function(cal, xtra) {
+                log("Class level hook caught for instance with id " + cal.id)
+            });
+
+            var calendar = new JSCalendar(document.getElementById('test-instance'));
+            calendar.init().setMatrix({
+                "5" : {},
+                "12": {},
+                "15": {},
+                "16": {}
+            }, true);
+        </script>
+    </body>
+</html>

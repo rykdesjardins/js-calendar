@@ -1,0 +1,88 @@
+.js-calendar {
+    font-family: "Arial";
+
+    -webkit-touch-callout: none; 
+    -webkit-user-select: none; 
+    -khtml-user-select: none; 
+    -moz-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none; 
+}
+
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #DDD;
+}
+
+.jscal-row {
+
+}
+
+.jscal-col {
+    border-collapse: collapse;
+    border: 1px solid #DDD;
+    vertical-align: top;
+}
+
+.cell-number {
+    display: block;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 2px;
+
+    color: #999;
+    cursor: pointer;
+
+    border-bottom: 1px dashed #EEE;
+}
+
+.js-cal-weekday {
+    text-align: center;
+    font-size: 12px;
+    height: 22px;
+    color: #555;
+}
+
+.control-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0px 6px;
+    color: #555;
+
+    cursor: pointer;
+}
+
+.control-button.active {
+    color: #000;
+    text-decoration: underline;
+}
+
+.jscal-col.cell-today {
+    background-color: #EEF;
+}
+
+.jscal-col.cell-today .cell-number {
+    background-color: #EEF;
+}
+
+.control-bar-widget {
+    height: 30px;
+}
+
+.control-bar-views {
+    float: left;
+}
+
+.control-bar-actions {
+    float: right;
+}
+
+.control-bar-title {
+    float: none;
+    text-align: center;
+    padding-top: 2px;
+    margin-bottom: -2px;
+}
