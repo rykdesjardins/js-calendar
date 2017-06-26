@@ -100,8 +100,18 @@ class JSCalendar {
                 this.state.month = 11;
                 this.state.year--;
             }
-        } else if (this.state.view == "year") {
-            this.state.year--;
+        } else if (this.state.view == "week") {
+            this.state.day -= 7;
+            if (this.state.day < 0) {
+                this.state.month--;
+                if (this.state.month == -1) {
+                    this.state.month = 11;
+                    this.state.year--;
+                }
+
+                let monthStat = JSCalendar.getDaysInMonth(this.state.year, this.state.month)
+                this.state.day = monthStat.numberOfDays;
+            }
         }
 
         this.render();
@@ -127,8 +137,18 @@ class JSCalendar {
                 this.state.month = 0;
                 this.state.year++;
             }
-        } else if (this.state.view == "year") {
-            this.state.year++;
+        } else if (this.state.view == "week") {
+            let monthStat = JSCalendar.getDaysInMonth(this.state.year, this.state.month);
+            this.state.day += 7;
+            if (this.state.day > monthStat.numberOfDays) {
+                this.state.month++;
+                if (this.state.month == 12) {
+                    this.state.month = 0;
+                    this.state.year++;
+                }
+
+                this.state.day = this.state.day - monthStat.numberOfDays;
+            }
         }
 
         this.render();
@@ -137,6 +157,8 @@ class JSCalendar {
     on(event, callback) {
         this.hooks[event] = this.hooks[event] || [];
         this.hooks[event].push(callback);
+
+        return this;
     }
 
     fire(event, extra) {
@@ -147,6 +169,8 @@ class JSCalendar {
         events.forEach(e => {
             e(this, extra);
         });
+
+        return this;
     }
 
     destroy() {
@@ -156,6 +180,8 @@ class JSCalendar {
         delete this.table;
 
         delete _jsCalWrapper[this.id];
+
+        return this;
     }
 
     render() {
@@ -165,6 +191,14 @@ class JSCalendar {
         this.fetch(() => {
             JSCalendar.emptyElem(this.table);
             switch (this.state.view) {
+                case "day":
+                    this.renderDay();
+                    break;
+
+                case "week":
+                    this.renderWeek();
+                    break;
+
                 case "month":
                 default:
                     this.renderMonth();
@@ -176,6 +210,138 @@ class JSCalendar {
         });
 
         return this;
+    }
+
+    renderDay() {
+        
+    }
+
+    formatTime(t) {
+        let h = t.getHours();
+        let m = t.getMinutes();
+        let s = t.getSeconds();
+
+        let append = "";
+        if (this.options.ampm) {
+            if (h > 11) {
+                h -= 12;
+                append = " PM";
+            } else {
+                append = " AM";
+            }
+        } 
+
+        return h + (m < 10 ? ":0" : ":") + m + (this.displaySeconds ? ((s < 10 ? ":0" : ":") + s) : "") + append;
+    }
+
+    renderWeek() {
+        const daystamp = 1000 * 60 * 60 * 24;
+
+        let dayrow = _a("tr", "cal-week-day-row", this.table);
+        let daycol = _a("td", "cal-week-day-col", dayrow);
+
+        let month = JSCalendar.getDaysInMonth(this.state.year, this.state.month);
+        let dayObj = new Date(this.state.year, this.state.month, this.state.day);
+        let firstDay = new Date(dayObj.getTime() - (dayObj.getDay() * daystamp));
+        let lastDay = new Date(firstDay.getTime() + (6 * daystamp));
+
+        let cDay = new Date(firstDay.getTime());
+        let row = Math.ceil(firstDay.getDate() / 7)
+        log("Rending matrix row number " + row);
+        for (let i = 0; i < 7; i++) {
+
+            let daysep = _a('div', "cal-week-day-sep", daycol);
+            daysep.textContent = this.options.daysVocab[cDay.getDay()] + ", " +
+                this.options.monthsVocab[cDay.getMonth()] + " " + cDay.getDate();
+
+            if (this.state.matrix[row][i] && this.state.matrix[row][i].length !== 0) {
+                let events = this.state.matrix[row][i];
+                for (let j = 0; j < events.length; j++) {
+                    let event = events[j]
+                    let eventCol = _a("div", "cal-week-day-event-col", daycol);
+
+                    if (event.displayname) {
+                        eventCol.classList.add("text-injected");
+                        eventCol.textContent = event.displayname;
+                    } else if (event.html) {
+                        eventCol.innerHTML = event.html;
+                        eventCol.classList.add("html-injected");
+                    } else {
+                        eventCol.classList.add("not-injected");
+                        eventCol.textContent = this.options.nonameEventVocab;
+                    }
+
+                    eventCol.style.background = event.color || this.options.eventBackground;
+
+                    !event.at && eventCol.classList.add("no-starting-time");
+                    !event.duration && eventCol.classList.add("no-duration");
+
+                    if (event.at) {
+                        // In case field is a timestamp represented as a string
+                        let type = typeof event.at;
+                        if (type == "string" && !isNaN(event.at)) {
+                            event.at = parseInt(event.at);
+                            type = typeof event.at;  // Should be "number", but won't hardcode
+                        }
+
+                        let outputString;
+                        switch (type) {
+                            case "number": 
+                            case "string": 
+                                let moment = new Date(event.at);
+                                outputString = this.formatTime(moment);
+
+                                if (event.duration) {
+                                    let end = new Date(moment.getTime() + event.duration);
+                                    outputString += " - " + this.formatTime(end);
+                                }
+                                break;
+
+                            case "object": // Date object
+                                outputString = this.formatTime(event.at);
+                                if (event.duration) {
+                                    let end = new Date(event.at.getTime() + event.duration);
+                                    outputString += " - " + this.formatTime(end);
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        if (outputString) {
+                            let timefloat = _a('span', 'cal-week-day-time-float', eventCol);
+                            timefloat.textContent = outputString;
+                        }
+                    }
+                }
+            } else {
+                let eventCol = _a("div", "cal-week-day-no-event-col", daycol);
+
+                eventCol.textContent = this.options.emptyDayVocab;
+            }
+
+            cDay = new Date(cDay.getTime() + daystamp);
+        }
+
+        if (firstDay.getMonth() == lastDay.getMonth()) {
+            this.titlecontroller.textContent = this.options.monthsVocab[firstDay.getMonth()] + " " + 
+                firstDay.getDate() + " - " + lastDay.getDate() + ", " + this.state.year;
+
+        } else if (firstDay.getYear() == lastDay.getYear()) {
+            this.titlecontroller.textContent = 
+                this.options.monthsVocab[firstDay.getMonth()] + " " + firstDay.getDate() + " - " +
+                this.options.monthsVocab[lastDay.getMonth()] + " " + lastDay.getDate() + ", " + 
+                this.state.year;
+
+        } else {
+            this.titlecontroller.textContent = 
+                this.options.monthsVocab[firstDay.getMonth()] + " " + firstDay.getDate() + ", " + 
+                firstDay.getFullYear() + " - " + 
+                this.options.monthsVocab[lastDay.getMonth()] + " " + lastDay.getDate() + ", " + 
+                lastDay.getFullYear();
+        }
+
     }
 
     renderMonth() {
@@ -207,6 +373,27 @@ class JSCalendar {
 
                 isCurrentMonth && currentDay == startAt && td.classList.add("cell-today");
                 tr.appendChild(td);
+
+                let events = this.state.matrix[row][col];
+                if (events) {
+                    for (let k = 0; k < events.length; k++) {
+                        let eMark = _a('div', 'cell-event-mark', td);
+
+                        if (events[k].at) {
+                            let dateText = this.formatTime(new Date(events[k].at));
+                            eMark.textContent = dateText;
+                        } else {
+                            eMark.textContent = this.options.noDate;
+                        }
+
+                        if (events[k].displayname) {
+                            let shortname = events[k].displayname.substring(0, 20);
+                            eMark.textContent += " - " + shortname + 
+                                (shortname.length != events[k].displayname ? "..." : "");
+                            eMark.style.background = events[k].color || this.options.eventBackground;
+                        }
+                    }
+                }
             }
         }
 
@@ -229,6 +416,8 @@ class JSCalendar {
             cols[i].style.height = (this.options.height / 6) + "px";
             cols[i].style.width  = (this.options.width / 7) + "px";
         }
+
+        this.elem.querySelector('.calendar-wrapper').style.maxHeight = (this.options.height + 40) + "px";
     }
 
     setDate(year, month, day, rerender) {
@@ -243,9 +432,13 @@ class JSCalendar {
     setMatrix(matrix, rerender) {
         log("Setting new matrix to instance " + this.id);
         this.fire('matrixWillSet');
+        if (!matrix) {
+            matrix = JSCalendar.defaultMatrix();
+        }
+
         if (matrix.length == 6) {
             this.state.matrix = matrix;
-        } else if (matrix.length == 1) {
+        } else if (matrix.length > 27) {
             let startAt = JSCalendar.getDaysInMonth(this.state.year, this.state.month).firstDay;
             let newMatrix = JSCalendar.defaultMatrix();
             let index = -1;
@@ -261,8 +454,8 @@ class JSCalendar {
             let startAt = JSCalendar.getDaysInMonth(this.state.year, this.state.month).firstDay;
             let newMatrix = JSCalendar.defaultMatrix();
             for (let daystr in matrix) if (!isNaN(daystr)) {
-                let index = parseInt(daystr) + startAt;
-                let row = index % 6;
+                let index = parseInt(daystr) + startAt - 1;
+                let row = Math.floor(index / 7);
                 let col = index % 7;
 
                 newMatrix[row][col] = matrix[daystr];
@@ -275,11 +468,17 @@ class JSCalendar {
 
         log("No problem setting new matrix to instance " + this.id);
         this.fire('matrixSet');
+        this.state.matrixmonth = this.state.month;
         rerender && this.render();
         return true;
     }
 
-    fetch(done) {
+    fetch(done, force) {
+        if (!force || this.state.month == this.state.matrixmonth) {
+            log("No need to fetch from data source");
+            return done && done(new Error("Same month, no need to update from server"));
+        }
+
         if (this.options.datasource) {
             this.fire('willFetch');
             let request = new XMLHttpRequest();
@@ -287,10 +486,19 @@ class JSCalendar {
                 request.setRequestHeader(header, this.options.datasourceHeaders[header]);
             }
 
+            const daystamp = 1000 * 60 * 60 * 24;
+            let dim = JSCalendar.getDaysInMonth(this.state.year, this.state.month);
+
+            let from = new Date(this.state.year, this.state.month, 1);
+            let to = new Date(this.state.year, this.state.month, dim.numberOfDays);
+
+            let firstStamp = from.getTime() - (from.getDay() * daystamp);
+            let endStamp = to.getTime() + ((6 - to.getDay()) * daystamp) + daystamp - 1;
+
             let url = this.options.datasource;
             url += (url.indexOf('?') != -1 ? "&" : "?") + "year=" + this.state.year + "&month=" + this.state.month +
-                "&day=" + this.state.day + "&view=" + this.state.view;
-
+                "&day=" + this.state.day + "&view=" + this.state.view + 
+                "&startstamp=" + firstStamp + "&endstamp=" + endStamp;
 
             request.onreadystatechange = () => {
                 if (request.readyState == XMLHttpRequest.DONE && request.status == 200) {
@@ -368,12 +576,13 @@ class JSCalendar {
     static createState() {
         let now = new Date();
         return {
-            view    : "month",
-            matrix  : JSCalendar.defaultMatrix(),
-            year    : now.getFullYear(),
-            month   : now.getMonth(), // array padding
-            day     : now.getDate(),
-            weekday : now.getDay()  // array padding, 0 is Sunday
+            view        : "month",
+            matrix      : JSCalendar.defaultMatrix(),
+            matrixmonth : now.getMonth(),
+            year        : now.getFullYear(),
+            month       : now.getMonth(), // array padding
+            day         : now.getDate(),
+            weekday     : now.getDay()  // array padding, 0 is Sunday
         };
     }
 
@@ -405,9 +614,21 @@ class JSCalendar {
                 "July", "August", "September", "October", "November", "December"
             ],
             daysVocab : ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            nthVocab : {
+                1 : "st",
+                2 : "nd",
+                3 : "rd",
+                default : "th"
+            },
+            emptyDayVocab : "Nothing here.",
+            noDate : "Somewhen",
+            nonameEventVocab : "Event without a name",
             globalSelector : ".js-calendar",
+            eventBackground : "rgb(126, 156, 193)",
             datasource : "",
             datasourceHeaders : {},
+            ampm : true,
+            displaySeconds : false,
             height : 700,
             width : 1024
         };
