@@ -14,7 +14,7 @@ var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 | views | Array of available views | ["day", "week", "month"] |
 | viewsVocab | Object of words used to represent the views { view : "display name" } | {day : "Day", week : "Week", month : "Month" } |
 | buttons | Available buttons in the top control bar | ["previous", "today", "next"] |
-| buttonsActions | JSCalendar function, or user-defined function object for top buttons { action : "functionName" || function } | { previous : "goBack", today : "goNow", next : "goNext" } |
+| buttonsActions | JSCalendar function, or user-defined function object for top buttons { action : "functionName" \|\| function } | { previous : "goBack", today : "goNow", next : "goNext" } |
 | buttonsVocab | Object of words used to represent the buttons { action : "display name" } | {previous : "<", today : "Today", next : ">"} |
 | monthsVocab | Array of display names for every months | ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] |
 | daysVocab | Array of display names for every week day | ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] |
