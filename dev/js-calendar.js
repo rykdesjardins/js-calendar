@@ -200,8 +200,7 @@ class JSCalendar {
             let word = this.options.viewsVocab[v] || v;
             let button = _a('button', 'control-button change-view change-view-' + v, this.viewcontroller);
             button.addEventListener('click', () => {
-                this.state.view = v;
-                this.render();
+                this.setView(v);
             });
             button.textContent = word;
         });
@@ -375,6 +374,15 @@ class JSCalendar {
         delete _jsCalWrapper[this.id];
 
         return this;
+    }
+
+    setView(view) {
+        this.fire('viewWillChange');
+        if (this.state.view != view) {
+            this.state.view = view;
+            this.render();
+            this.fire('viewChanged');
+        }
     }
 
     render() {
