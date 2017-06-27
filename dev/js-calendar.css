@@ -13,6 +13,10 @@
     user-select: none; 
 }
 
+.js-calendar.dragging {
+    cursor : -webkit-grabbing;
+}
+
 .calendar-table {
     width: 100%;
     border-collapse: collapse;
@@ -76,6 +80,15 @@
     margin: 0px 2px 2px;
 
     border: 1px solid rgba(0,0,0,0.2);
+
+    cursor: move;
+    cursor: -webkit-grab;
+}
+
+.cell-event-mark.dragged {
+    border-style : dashed;
+    opacity : 0.5;
+    cursor : -webkit-grabbing;
 }
 
 .cal-week-day-event-col.text-injected {
