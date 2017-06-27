@@ -2,6 +2,9 @@
 The lightest Javascript calendar out there, without any dependency (no jQuery). 
 This is a work in progress, so it is not ready to be used in production.
 
+## Sailor's honour
+This will be finished soon. It is needed for a bigger project anyways. If other kind developers want to lend a hand, I will obviously stop pushing directly to master and switch to a dev branch ;)
+
 ## Basic usage
 ```javascript 
 var elem = document.getElementById("myCalendar");
