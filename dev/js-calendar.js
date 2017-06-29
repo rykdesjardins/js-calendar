@@ -670,6 +670,40 @@ class JSCalendar {
         return this;
     }
 
+    debug() {
+        let matrix = [];
+
+        for (let i = 0; i < this.state.matrix.length; i++) {
+            let row = [];
+            for (let j = 0; j < this.state.matrix[i].length; j++) {
+                let obj = false;
+                if (this.state.matrix[i][j]) {
+                    obj = [];
+                    for (let k = 0; k < this.state.matrix[i][j].length; k++) {
+                        obj.push({
+                            displayname : this.state.matrix[i][j][k].displayname,
+                            at : this.state.matrix[i][j][k].at,
+                            duration : this.state.matrix[i][j][k].duration
+                        });
+                    }
+                }
+
+                row.push(obj);
+            }
+
+            matrix.push(row);
+        }
+
+        return {
+            year : this.state.year,
+            month : this.state.month,
+            day : this.state.day,
+            weekday : this.state.weekday,
+            view : this.state.view,
+            matrix
+        };
+    }
+
     fetch(done, force) {
         if (!force && this.state.matrices[this.state.year + "-" + this.state.month]) {
             log("Loading matrix from local cache");

@@ -11,6 +11,10 @@
 
         </div>
 
+        <pre id="stateOutput">
+            [State]
+        </pre>
+
         <div id="errorWrapper" style="color:#999;">
             No uncaught error!
         </div>
@@ -36,6 +40,13 @@
                     calendar.state.month == today.getMonth() && 
                     calendar.state.year  == today.getFullYear()
                 ) ? "bold" : "";
+
+            }).on('rendered', function(inst) {
+                document.getElementById('stateOutput').textContent = JSON.stringify(inst.debug(), null, 4);
+
+            }).on('cellMoved', function(inst) {
+                document.getElementById('stateOutput').textContent = JSON.stringify(inst.debug(), null, 4);
+
             }).setMatrix({
                 "5"  : [{displayname : "You can't miss this event"}],
                 "12" : [
