@@ -73,6 +73,8 @@ JSCalendar.on('eventName', (calendar, extra) => {
 | cellDidNotMoved | Fired when a cell could have moved, but the validation failed or the event was dropped onto its original cell. |
 | matrixWillSet | Fired when a matrix is sent to replace the current one in the calendar's state. |
 | matrixSet | Fired after a matrix was set as the current matrix state. |
+| matrixWillAppend | Fired when another matrix is about to be inserted into the current matrix state |
+| matrixAppended | Fired after another matrix was inserted into the current matrix state |
 | willFetch | Fired before sending a fetch request to a data source. |
 | fetched | Fired after receiving data from the data source. |
 | viewWillChange | Fired before rendering a new view (month, week, day). |
