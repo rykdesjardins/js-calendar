@@ -12,7 +12,7 @@ var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 ```
 
 ## Simple design and fast rendering
-![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss.png "Screenshot of provided demo in example.html")
+![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-month.jpg "Screenshot of provided demo in example.html")
 
 ## Options
 | Option name | Usage | Default |
@@ -34,6 +34,9 @@ var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 | datasourceHeaders | Headers to be sent to the data source on every request | {} |
 | ampm | Flag, setting it to true will use 12h system, false will use 24h | true |
 | displaySeconds | Flag, setting it to true will display the seconds for the events in the calendar | false |
+| dayviewGapMinutes | Number of minutes between each block in day view | 30 |
+| dayviewNoTimeGapSize | Number of block used in day view for events without a time | 2 |
+| dayviewGapHeight | Height of a block in day view, in pixels | 38 |
 | height | Maximum height for the calendar, if it goes beyond, scroll bars are added | 700 |
 | width | Maximum width for the calendar, if it goes beyond, the rest will be hidden. This can be a percentage. | 1024 |
 
@@ -70,15 +73,17 @@ JSCalendar.on('eventName', (calendar, extra) => {
 | cellDidNotMoved | Fired when a cell could have moved, but the validation failed or the event was dropped onto its original cell. |
 | matrixWillSet | Fired when a matrix is sent to replace the current one in the calendar's state. |
 | matrixSet | Fired after a matrix was set as the current matrix state. |
+| matrixWillAppend | Fired when another matrix is about to be inserted into the current matrix state |
+| matrixAppended | Fired after another matrix was inserted into the current matrix state |
 | willFetch | Fired before sending a fetch request to a data source. |
 | fetched | Fired after receiving data from the data source. |
 | viewWillChange | Fired before rendering a new view (month, week, day). |
 | viewChanged | Fired after changing view. This will not fire if the view was set to the current one (wasn't changed). |
 
+## More screenshots
 
-## No conflicts with overlapping events
+### No conflicts with overlapping events
 ![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-day.jpg "Screenshot of provided demo in example.html")
 
-## Week view
-![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-week.png "Screenshot of provided demo in example.html")
-
+### Week view
+![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-week.jpg "Screenshot of provided demo in example.html")
