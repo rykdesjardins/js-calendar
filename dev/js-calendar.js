@@ -808,7 +808,7 @@ class JSCalendar {
         let newPos = this.state.newPosition;
 
         this.fire('cellMightMove', ev);
-        if (this.state.view == "day") {
+        if (this.state.view == "day" && ev.potentialnewtop) {
             let ev = this.state.dragged;
             let newtop = ev.potentialnewtop;
             newtop = newtop - (newtop % this.options.dayviewGapHeight);
