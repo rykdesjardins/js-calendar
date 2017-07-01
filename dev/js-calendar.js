@@ -26,7 +26,7 @@ class JSCalendarEvent {
     }
 
     setData(data) {
-        this.at = data.at;
+        this.at = data.at && new Date(data.at);
         this.duration = data.duration;
         this.displayname = data.displayname;
         this.color = data.color;
@@ -52,80 +52,83 @@ class JSCalendarEvent {
     }
 
     buildElements() {
-        let eMark = _a('div', 'cell-event-mark');
+        let monthElem = _a('div', 'cell-event-mark');
+        let weekElem = _a("div", "cal-week-day-event-col");
+        let dayElem = _a("div", "cal-total-day-event-view");
 
+        // Month element
         if (this.at) {
             let dateText = this.formatTime(new Date(this.at));
-            eMark.textContent = dateText;
+            monthElem.textContent = dateText;
+            monthElem.dataset.at = this.at;
         } 
 
         if (this.displayname) {
             let shortname = this.displayname.substring(0, this.options.titleCropSize);
-            eMark.textContent += (this.at ? " - " : "") + shortname + 
+            monthElem.textContent += (this.at ? " - " : "") + shortname + 
                 (shortname.length != this.displayname ? "..." : "");
         }
 
-        eMark.style.background = this.color || this.options.eventBackground;
+        monthElem.style.background = this.color || this.options.eventBackground;
 
-        this.monthElem = eMark;
-
-        let eventCol = _a("div", "cal-week-day-event-col");
-
+        // Week element
         if (this.displayname) {
-            eventCol.classList.add("text-injected");
-            eventCol.textContent = this.displayname;
+            weekElem.classList.add("text-injected");
+            weekElem.textContent = this.displayname;
         } else if (this.html) {
-            eventCol.innerHTML = this.html;
-            eventCol.classList.add("html-injected");
+            weekElem.innerHTML = this.html;
+            weekElem.classList.add("html-injected");
         } else {
-            eventCol.classList.add("not-injected");
-            eventCol.textContent = this.options.nonameEventVocab;
+            weekElem.classList.add("not-injected");
+            weekElem.textContent = this.options.nonameEventVocab;
         }
 
-        eventCol.style.background = this.color || this.options.eventBackground;
+        weekElem.style.background = this.color || this.options.eventBackground;
 
-        !this.at && eventCol.classList.add("no-starting-time");
-        !this.duration && eventCol.classList.add("no-duration");
+        !this.at &&       weekElem.classList.add("no-starting-time");
+        !this.duration && weekElem.classList.add("no-duration");
 
         if (this.at) {
-            // In case field is a timestamp represented as a string
-            let type = typeof this.at;
-            if (type == "string" && !isNaN(this.at)) {
-                this.at = parseInt(this.at);
-                type = typeof this.at;  // Should be "number", but won't hardcode
-            }
-
             let outputString;
-            switch (type) {
-                case "number": 
-                case "string": 
-                    let moment = new Date(this.at);
-                    outputString = this.formatTime(moment);
-
-                    if (this.duration) {
-                        let end = new Date(moment.getTime() + this.duration);
-                        outputString += " - " + this.formatTime(end);
-                    }
-                    break;
-
-                case "object": // Date object
-                    outputString = this.formatTime(this.at);
-                    if (this.duration) {
-                        let end = new Date(this.at.getTime() + this.duration);
-                        outputString += " - " + this.formatTime(end);
-                    }
-                    break;
-
-                default:
-                    break;
+            outputString = this.formatTime(this.at);
+            if (this.duration) {
+                let end = new Date(this.at.getTime() + this.duration);
+                outputString += " - " + this.formatTime(end);
             }
 
-            if (outputString) {
-                let timefloat = _a('span', 'cal-week-day-time-float', eventCol);
-                timefloat.textContent = outputString;
-            }
+            let timefloat = _a('span', 'cal-week-day-time-float', weekElem);
+            timefloat.textContent = outputString;
         }
-        this.weekElem = eventCol;
+
+        // Day element
+        let gapMinuteSize = this.options.dayviewGapMinutes;
+        let gapsPerHour = 60 / gapMinuteSize;
+        if (this.at) {
+            let gap = this.at.getHours() * gapsPerHour;
+            gap += this.at.getMinutes() * gapMinuteSize;
+            dayElem.dataset.gapcell = gap; 
+        } else {
+            dayElem.dataset.gapcell = -1;
+            dayElem.classList.add("no-time");
+        }
+
+        if (this.duration) {
+            dayElem.dataset.gapcount = Math.ceil(this.duration / 1000 / 60 / gapMinuteSize);
+        } else {
+            dayElem.dataset.gapcount = 1;
+            dayElem.classList.add("no-duration");
+        }
+
+        dayElem.style.background = this.color || this.options.eventBackground;
+
+        let dayText = _a('span', 'cal-total-day-displayname', dayElem);
+        dayText.textContent = this.displayname || this.options.nonameEventVocab;
+        
+
+        // Final affectation
+        this.monthElem = monthElem;
+        this.weekElem = weekElem;
+        this.dayElem = dayElem;
     }
 
     dragging() {
@@ -141,7 +144,7 @@ class JSCalendarEvent {
     }
 
     bindEvents() {
-        this.monthElem && this.monthElem.addEventListener('mousedown', () => {
+        this.monthElem.addEventListener('mousedown', () => {
             let finish = () => {
                 window.removeEventListener('mouseup', finish);
                 this.dropped();
@@ -151,7 +154,7 @@ class JSCalendarEvent {
             this.dragging();
         });
 
-        this.weekElem && this.weekElem.addEventListener('mousedown', () => {
+        this.weekElem.addEventListener('mousedown', () => {
             let finish = () => {
                 window.removeEventListener('mouseup', finish);
                 this.dropped();
@@ -184,6 +187,10 @@ class JSCalendar {
         this.options = Object.assign(JSCalendar.defaultOptions, options || { defaultOptions : true });
         this.state = JSCalendar.createState();
         this.hooks = {};
+
+        if (Math.floor(60 / this.options.dayviewGapMinutes) != (60 / this.options.dayviewGapMinutes)) {
+            throw new Error("Option dayviewGapMinutes must be a divisor of 60");
+        }
 
         this.fire("new");
     }
@@ -239,7 +246,6 @@ class JSCalendar {
         this.state.day = now.getDate();
         this.state.weekday = now.getDay();
 
-        this.state.view = "month";
         this.render();
     }
 
@@ -319,6 +325,16 @@ class JSCalendar {
         this.render();
     }
 
+    goToDay(position) {
+        let date = position.split('-');
+        date = new Date(date[0], date[1], date[2]);
+
+        this.state.year = date.getFullYear();
+        this.state.month = date.getMonth();
+        this.state.day = date.getDate();
+        this.setView("day");
+    }
+
     push(item) {
         this.fire('willPush', item);
         let date = new Date(item.at);
@@ -368,16 +384,14 @@ class JSCalendar {
     }
 
     destroy() {
-        if (this.state.matrix) {
-            this.state.matrix.forEach(row => {
-                row.forEach(col => {
-                    if (col && col.length) {
-                        col.forEach(ev => {
-                            ev.destroy();
-                        });
+        for (let year in this.state.matrix) {
+            for (let month in this.state.matrix[year]) {
+                for (let day in this.state.matrix[year][month]) {
+                    for (let i = 0; i < this.state.matrix[year][month][day].length; i++) {
+                        this.state.matrix[year][month][day][i].destroy();
                     }
-                });
-            }); 
+                }
+            }
         }
 
         delete this.elem;
@@ -390,10 +404,26 @@ class JSCalendar {
         return this;
     }
 
+    adjustDateToView() {
+        if (this.state.view == "week" && this.state.weekday != this.state.day && this.state.day < 8) {
+            this.state.month--;
+            this.state.day = JSCalendar.getDaysInMonth(this.state.year, this.state.month).numberOfDays;
+        }
+    }
+
+    getDateAppendee(d = this.state.day) {
+        if (d > 3 && d < 21) {
+            return this.options.nthVocab.default;
+        }
+
+        return this.options.nthVocab[d.toString().slice(-1)] || this.options.nthVocab.default;
+    }
+
     setView(view) {
         this.fire('viewWillChange');
         if (this.state.view != view) {
             this.state.view = view;
+            this.adjustDateToView();
             this.render();
             this.fire('viewChanged');
         }
@@ -431,7 +461,28 @@ class JSCalendar {
     }
 
     renderDay() {
-        
+        this.titlecontroller.textContent = this.options.monthsVocab[this.state.month] + " " + 
+            this.state.day + this.getDateAppendee() + ", " + this.state.year;
+
+        let dayrow = _a("tr", "cal-week-day-row", this.table);
+        let daycol = _a("td", "cal-week-day-col", dayrow);
+
+        this.validateCell();
+        let events = this.state.matrix[this.state.year][this.state.month][this.state.day];
+        let noTimeWrap = _a('div', 'single-day-no-time-wrap', daycol);
+
+        events.filter(e => !e.at).forEach(e => {
+            e.render(this.state.view, noTimeWrap);
+        });
+
+        // Loop through hours
+        let minGap = this.options.dayviewGapMinutes;
+        let gapsPerHour = Math.ceil(60 / minGap);
+        for (let h = 0; h < 24; h++) {
+            let hourBlock = _a('div', 'hour-block', daycol);
+            let timespan = _a('span', 'hour-block-time', hourBlock);
+            timespan.textContent = h + ":00";
+        }
     } 
 
     renderWeek() {
@@ -445,53 +496,68 @@ class JSCalendar {
         let firstDay = new Date(dayObj.getTime() - (dayObj.getDay() * daystamp));
         let lastDay = new Date(firstDay.getTime() + (6 * daystamp));
 
+        this.validateCell(firstDay.getFullYear(), firstDay.getMonth(), firstDay.getDate());
+        this.validateCell(lastDay.getFullYear(), lastDay.getMonth(), lastDay.getDate());
+
+        log("Rending matrix week");
         let cDay = new Date(firstDay.getTime());
-        let row = Math.ceil(firstDay.getDate() / 7)
-        log("Rending matrix row number " + row);
         for (let i = 0; i < 7; i++) {
+            let y = cDay.getFullYear();
+            let m = cDay.getMonth();
+            let d = cDay.getDate();
+            let w = cDay.getDay();
+            let t = cDay.getTime();
+
             let daysep = _a('div', "cal-week-day-sep", daycol);
-            daysep.textContent = this.options.daysVocab[cDay.getDay()] + ", " +
-                this.options.monthsVocab[cDay.getMonth()] + " " + cDay.getDate();
+            daysep.textContent = this.options.daysVocab[w] + ", " +
+                this.options.monthsVocab[m] + " " + d;
 
             let daycontainer = _a('div', "col-week-day-container", daycol);
-            if (this.state.matrix[row][i] && this.state.matrix[row][i].length !== 0) {
-                let events = this.state.matrix[row][i];
+            if (this.state.matrix[y][m][d]) {
+                let events = this.state.matrix[y][m][d];
                 for (let j = 0; j < events.length; j++) {
                     let event = events[j];
                     event.render(this.state.view, daycontainer);
                 }
             }
 
-            daycontainer.dataset.row = row;
-            daycontainer.dataset.col = i;
+            let fulldate = y + "-" + m + "-" + d;
+            daycontainer.dataset.fulldate = fulldate; 
             daycontainer.addEventListener('mouseenter', () => {
                 if (this.state.dragging) {
                     daycontainer.appendChild(this.state.dragged.weekElem);
-                    this.state.newPosition = [daycontainer.dataset.row, daycontainer.dataset.col];
+                    this.state.newPosition = fulldate;
                 }
+            });
+
+            daysep.addEventListener('click', () => {
+                this.goToDay(fulldate);
             });
 
             let eventCol = _a("div", "cal-week-day-no-event-col", daycontainer);
             eventCol.textContent = this.options.emptyDayVocab;
 
-            cDay = new Date(cDay.getTime() + daystamp);
+            cDay = new Date(t + daystamp);
         }
+
+        let firstDayAppend = this.getDateAppendee(firstDay.getDate())
+        let lastDayAppend = this.getDateAppendee(lastDay.getDate());
 
         if (firstDay.getMonth() == lastDay.getMonth()) {
             this.titlecontroller.textContent = this.options.monthsVocab[firstDay.getMonth()] + " " + 
-                firstDay.getDate() + " - " + lastDay.getDate() + ", " + this.state.year;
+                firstDay.getDate() + firstDayAppend + " - " + lastDay.getDate() + lastDayAppend + ", " + this.state.year;
 
         } else if (firstDay.getYear() == lastDay.getYear()) {
             this.titlecontroller.textContent = 
-                this.options.monthsVocab[firstDay.getMonth()] + " " + firstDay.getDate() + " - " +
-                this.options.monthsVocab[lastDay.getMonth()] + " " + lastDay.getDate() + ", " + 
+                this.options.monthsVocab[firstDay.getMonth()] + " " + firstDay.getDate() + firstDayAppend + " - " +
+                this.options.monthsVocab[lastDay.getMonth()] + " " + lastDay.getDate() + lastDayAppend + ", " + 
                 this.state.year;
 
         } else {
             this.titlecontroller.textContent = 
-                this.options.monthsVocab[firstDay.getMonth()] + " " + firstDay.getDate() + ", " + 
+                this.options.monthsVocab[firstDay.getMonth()] + " " + firstDay.getDate() + firstDayAppend + ", " + 
                 firstDay.getFullYear() + " - " + 
-                this.options.monthsVocab[lastDay.getMonth()] + " " + lastDay.getDate() + ", " + 
+                this.options.monthsVocab[lastDay.getMonth()] + " " + lastDay.getDate() + lastDayAppend + ", " + 
                 lastDay.getFullYear();
         }
 
@@ -512,36 +578,46 @@ class JSCalendar {
             td.textContent = this.options.daysVocab[day];
         }
 
-        for (let row = 0; row < this.state.matrix.length; row++) {
+        for (let row = 0; row < 6; row++) {
             let tr = _a('tr', "jscal-row row" + row, this.table);
 
-            for (let col = 0; col < this.state.matrix[row].length; col++) {
+            for (let col = 0; col < 7; col++) {
+                let date = new Date(this.state.year, this.state.month, ++startAt);
+
                 let td = _a('td', 'jscal-col row' + row + "col" + col, tr);
-                if (++startAt <= 0 || startAt > totalDays) {
+                let inMonth = true;
+                let daySpan = _a('span', 'cell-number', td);
+                if (startAt <= 0 || startAt > totalDays) {
+                    let inMonth = false;
                     td.classList.add("notinmonth");
+                    daySpan.textContent = date.getDate();
                 } else {
-                    let daySpan = _a('span', 'cell-number', td);
-                    daySpan.textContent = startAt;
+                    daySpan.classList.add("not-in-month");
+                    daySpan.textContent = date.getDate();
                 }
 
                 isCurrentMonth && currentDay == startAt && td.classList.add("cell-today");
                 tr.appendChild(td);
 
-                let events = this.state.matrix[row][col];
+                this.validateCell(date.getFullYear(), date.getMonth(), date.getDate());
+                let events = this.state.matrix[date.getFullYear()][date.getMonth()][date.getDate()];
                 if (events) {
                     for (let k = 0; k < events.length; k++) {
                         events[k].render(this.state.view, td);
                     }
                 }
 
-                td.dataset.row = row;
-                td.dataset.col = col;
-
+                let fulldate = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate();
+                td.dataset.fulldate = fulldate;
                 td.addEventListener('mouseenter', () => {
                     if (this.state.dragging) {
                         td.appendChild(this.state.dragged.monthElem);
-                        this.state.newPosition = [td.dataset.row, td.dataset.col];
+                        this.state.newPosition = td.dataset.fulldate;
                     }
+                });
+
+                daySpan.addEventListener('click', () => {
+                    this.goToDay(fulldate);
                 });
             }
         }
@@ -578,21 +654,43 @@ class JSCalendar {
         rerender && this.render();
     }
 
+    validateCell(year = this.state.year, month = this.state.month, day = this.state.day) {
+        if (!this.state.matrix[year]) {
+            this.state.matrix[year] = {
+                0 : {}, 1 : {}, 2 : {}, 3 : {}, 4 : {}, 5 : {},
+                6 : {}, 7 : {}, 8 : {}, 9 : {}, 10: {}, 11: {}
+            }
+        }
+
+        if (!this.state.matrix[year][month]) {
+            this.state.matrix[year][month] = {};
+        }
+
+        if (!this.state.matrix[year][month][day]) {
+            this.state.matrix[year][month][day] = [];
+        }
+    }
+
     moveCell(ev) {
         let oldPos = ev.position;
         let newPos = this.state.newPosition;
 
         this.fire('cellMightMove', ev);
-        if (newPos && (oldPos[0] != newPos[0] || oldPos[1] != newPos[1])) {
+        if (newPos && newPos != oldPos) {
             this.fire('cellWillMove', {event : ev, oldPosition : oldPos, newPosition : newPos});
-            let dayCell = this.state.matrix[oldPos[0]][oldPos[1]];
+            let oldPosObj = oldPos.split('-');
+            let newPosObj = newPos.split('-');
+
+            let dayCell = this.state.matrix[oldPosObj[0]][oldPosObj[1]][oldPosObj[2]];
             let index = dayCell ? dayCell.indexOf(ev) : -1;
 
             if (index != -1) {
                 dayCell.splice(index, 1);
-                let arr = this.state.matrix[newPos[0]][newPos[1]];
+                this.validateCell(newPosObj[0], newPosObj[1], newPosObj[2]);
+
+                let arr = this.state.matrix[newPosObj[0]][newPosObj[1]][newPosObj[2]];
                 arr = arr || [];
-                this.state.matrix[newPos[0]][newPos[1]] = arr;
+                this.state.matrix[newPosObj[0]][newPosObj[1]][newPosObj[2]] = arr;
                 arr.push(ev);
 
                 ev.position = newPos;
@@ -622,8 +720,36 @@ class JSCalendar {
         this.elem.classList.remove("dragging");
     }
 
-    preloadMatrix(matrix, year, month) {
-        this.state.matrices[year + "-" + month] = matrix;
+    appendMatrix(matrix, rerender) {
+        this.fire("matrixWillAppend");
+        let newMatrix = this.state.matrix;
+
+        for (let year in matrix) {
+            if (!newMatrix[year]) {
+                newMatrix[year] = {
+                    0 : {}, 1 : {}, 2 : {}, 3 : {}, 4  : {}, 5  : {}, 
+                    6 : {}, 7 : {}, 8 : {}, 9 : {}, 10 : {}, 11 : {}
+                };
+            }
+
+            let monthsToMerge = matrix[year];
+            for (let month in monthsToMerge) {
+                let days = matrix[year][month];
+                for (let day in days) {
+                    if (!newMatrix[year][month][day]) {
+                        newMatrix[year][month][day] = [];
+                    }
+
+                    newMatrix[year][month][day].push(...matrix[year][month][day].map(e => {
+                        return new JSCalendarEvent(e, this, year + "-" + month + "-" + day);
+                    }));
+                }
+            }
+        }
+
+        this.fire("matrixAppended");
+        rerender && this.render();
+        return this;
     }
 
     setMatrix(matrix, rerender) {
@@ -633,89 +759,39 @@ class JSCalendar {
             matrix = JSCalendar.defaultMatrix();
         }
 
-        if (matrix.length == 6) {
-            this.state.matrix = matrix;
-            for (let row = 0; row < matrix.length; row++) {
-                for (let col = 0; col < matrix[row].length; col++) {
-                    if (this.state.matrix[row][col]) {
-                        let arr = [];
-                        for (let k = 0; k < this.state.matrix[row][col].length; k++) {
-                            arr.push(new JSCalendarEvent(this.state.matrix[row][col][k], this, [row, col]));
-                        }
-                        this.state.matrix[row][col] = arr;
-                    } else {
-                        this.state.matrix[row][col] = [];
+        this.state.matrix = matrix;
+
+        for (let year in this.state.matrix) {
+            for (let month in this.state.matrix[year]) {
+                for (let day in this.state.matrix[year][month]) {
+                    for (let i = 0; i < this.state.matrix[year][month][day].length; i++) {
+                        this.state.matrix[year][month][day][i] = new JSCalendarEvent(
+                            this.state.matrix[year][month][day][i],
+                            this,
+                            year + "-" + month + "-" + day
+                        );
                     }
                 }
             }
-        } else if (matrix.length > 27) {
-            let startAt = JSCalendar.getDaysInMonth(this.state.year, this.state.month).firstDay;
-            let newMatrix = JSCalendar.defaultMatrix();
-            let index = -1;
-            for (let i = 0; i < newMatrix.length; i++) {
-                index++;
-                for (let j = (!i?startAt:0); j < 7; i++) {
-                    newMatrix[i][j] = [];
-                    if (matrix[index] && matrix[index].length) {
-                        for (let k = 0; k < matrix[index].length; k++) {
-                            newMatrix[i][j].push(new JSCalendarEvent(matrix[index], this, [i, j]));
-                        }
-                    }
-                }
-            }
-
-            this.state.matrix = newMatrix;
-        } else if (typeof matrix == "object" && !Array.isArray(matrix)) {
-            let startAt = JSCalendar.getDaysInMonth(this.state.year, this.state.month).firstDay;
-            let newMatrix = JSCalendar.defaultMatrix();
-            for (let daystr in matrix) if (!isNaN(daystr)) {
-                let index = parseInt(daystr) + startAt - 1;
-                let row = Math.floor(index / 7);
-                let col = index % 7;
-
-                newMatrix[row][col] = [];
-                if (matrix[daystr] && matrix[daystr].length) {
-                    for (let k = 0; k < matrix[daystr].length; k++) {
-                        newMatrix[row][col].push(new JSCalendarEvent(matrix[daystr][k], this, [row, col]));
-                    }
-                }
-            }
-
-            this.state.matrix = newMatrix;
-        } else {
-            return false;
         }
 
         log("No problem setting new matrix to instance " + this.id);
         this.fire('matrixSet');
         this.state.matrixmonth = this.state.month;
-        this.state.matrices[this.state.year + "-" + this.state.month] = this.state.matrix;
         rerender && this.render();
         return this;
     }
 
     debug() {
-        let matrix = [];
-
-        for (let i = 0; i < this.state.matrix.length; i++) {
-            let row = [];
-            for (let j = 0; j < this.state.matrix[i].length; j++) {
-                let obj = false;
-                if (this.state.matrix[i][j]) {
-                    obj = [];
-                    for (let k = 0; k < this.state.matrix[i][j].length; k++) {
-                        obj.push({
-                            displayname : this.state.matrix[i][j][k].displayname,
-                            at : this.state.matrix[i][j][k].at,
-                            duration : this.state.matrix[i][j][k].duration
-                        });
-                    }
-                }
-
-                row.push(obj);
-            }
-
-            matrix.push(row);
+        let matrix = { };
+        
+        for (let day in this.state.matrix[this.state.year][this.state.month]) {
+            let events = this.state.matrix[this.state.year][this.state.month][day];
+            matrix[day] = events.map(e => { return { 
+                displayname : e.displayname,
+                at : new Date(e.at),
+                duration : e.duration
+            }});
         }
 
         return {
@@ -724,14 +800,13 @@ class JSCalendar {
             day : this.state.day,
             weekday : this.state.weekday,
             view : this.state.view,
-            matrix
+            monthMatrix : matrix
         };
     }
 
     fetch(done, force) {
-        if (!force && this.state.matrices[this.state.year + "-" + this.state.month]) {
+        if (!force && this.state.matrix[this.state.year] && this.state.matrix[this.state.year][this.state.month]) {
             log("Loading matrix from local cache");
-            this.state.matrix = this.state.matrices[this.state.year + "-" + this.state.month];
             done && done();
         } else if (this.options.datasource) {
             this.fire('willFetch');
@@ -760,7 +835,7 @@ class JSCalendar {
                         let maybeMatrix = JSON.parse(request.responseText);
                         this.fire('fetched', maybeMatrix);
 
-                        if (this.setMatrix(maybeMatrix)) {
+                        if (this.appendMatrix(maybeMatrix)) {
                             log("Updated matrix from data source")
                             done && done(undefined, maybeMatrix);
                         } else {
@@ -781,7 +856,18 @@ class JSCalendar {
             request.open('GET', url);
             request.send();
         } else {
-            this.setMatrix(JSCalendar.defaultMatrix());
+            log("Created new entry in matrix for " + this.state.year + "/" + this.state.month);
+            if (!this.state.matrix[this.state.year]) {
+                this.state.matrix[this.state.year] = {
+                    0 : {}, 1 : {}, 2 : {}, 3 : {}, 4 : {}, 5 : {}, 
+                    6 : {}, 7 : {}, 8 : {}, 9 : {}, 10 : {}, 11 : {}
+                };
+            }
+
+            if (!this.state.matrix[this.state.year][this.state.month]) {
+                this.state.matrix[this.state.year][this.state.month] = {};
+            }
+
             done && done(new Error("Invalid datasource"));
         }
 
@@ -817,15 +903,19 @@ class JSCalendar {
     }
 
     static defaultMatrix() {
-        return [ 
-            // Sun  Mon    Tue    Wed    Thu    Fri    Sat
-            [false, false, false, false, false, false, false], 
-            [false, false, false, false, false, false, false], 
-            [false, false, false, false, false, false, false], 
-            [false, false, false, false, false, false, false], 
-            [false, false, false, false, false, false, false], 
-            [false, false, false, false, false, false, false]
-        ];
+        let year = new Date().getFullYear();
+        return {
+            [year-1] : {
+                0 : {}, 1 : {}, 2 : {}, 3 : {}, 4 : {}, 5 : {},
+                6 : {}, 7 : {}, 8 : {}, 9 : {}, 10 : {}, 11 : {}
+            },
+            [year] : {
+                0 : {}, 1 : {}, 2 : {}, 3 : {}, 4 : {}, 5 : {}, 6 : {}, 7 : {}, 8 : {}, 9 : {}, 10 : {}, 11 : {}
+            },
+            [year+1] : {
+                0 : {}, 1 : {}, 2 : {}, 3 : {}, 4 : {}, 5 : {}, 6 : {}, 7 : {}, 8 : {}, 9 : {}, 10 : {}, 11 : {}
+            }
+        };
     }
 
     static createState() {
@@ -835,7 +925,6 @@ class JSCalendar {
 
             matrix      : JSCalendar.defaultMatrix(),
             matrixmonth : now.getMonth(),
-            matrices    : {},
             
             year        : now.getFullYear(),
             month       : now.getMonth(),   // has array padding, 0 is January
@@ -886,6 +975,7 @@ class JSCalendar {
             globalSelector : ".js-calendar",
             eventBackground : "rgb(126, 156, 193)",
             titleCropSize : 20,
+            dayviewGapMinutes : 5,
             datasource : "",
             datasourceHeaders : {},
             ampm : true,

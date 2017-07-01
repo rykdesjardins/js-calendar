@@ -28,26 +28,9 @@
 
             var today = new Date();
 
-            var calendar = new JSCalendar(document.getElementById('test-instance'), {
-                titleCropSize : 30,
-                eventBackground : "rgb(193, 155, 113)"
-            });
-            calendar.init();
-
-            calendar.on('willRender', function() {
-                var titleBar = calendar.elem.querySelector('.control-bar-title'); 
-                titleBar.style.fontWeight = (
-                    calendar.state.month == today.getMonth() && 
-                    calendar.state.year  == today.getFullYear()
-                ) ? "bold" : "";
-
-            }).on('rendered', function(inst) {
-                document.getElementById('stateOutput').textContent = JSON.stringify(inst.debug(), null, 4);
-
-            }).on('cellMoved', function(inst) {
-                document.getElementById('stateOutput').textContent = JSON.stringify(inst.debug(), null, 4);
-
-            }).setMatrix({
+            var matrix = {};
+            matrix[today.getFullYear()] = {};
+            matrix[today.getFullYear()][today.getMonth()] = {
                 "5"  : [{displayname : "You can't miss this event", color : "#792aca"}],
                 "12" : [
                     {
@@ -86,7 +69,7 @@
                         at : new Date(0,0,0, 9)
                     }
                 ],
-                "29" : [
+                "27" : [
                     {
                         displayname : "Short monthly recap meeting",
                         at : new Date(0,0,0, 15, 30),
@@ -94,7 +77,28 @@
                         duration : 1000 * 60 * 30
                     }
                 ]
-            }).render();
+            };
+
+            var calendar = new JSCalendar(document.getElementById('test-instance'), {
+                titleCropSize : 30,
+                eventBackground : "rgb(193, 155, 113)"
+            });
+            calendar.init();
+
+            calendar.on('willRender', function() {
+                var titleBar = calendar.elem.querySelector('.control-bar-title'); 
+                titleBar.style.fontWeight = (
+                    calendar.state.month == today.getMonth() && 
+                    calendar.state.year  == today.getFullYear()
+                ) ? "bold" : "";
+
+            }).on('rendered', function(inst) {
+                document.getElementById('stateOutput').textContent = JSON.stringify(inst.debug(), null, 4);
+
+            }).on('cellMoved', function(inst) {
+                document.getElementById('stateOutput').textContent = JSON.stringify(inst.debug(), null, 4);
+
+            }).setMatrix( matrix ).render();
         </script>
     </body>
 </html>

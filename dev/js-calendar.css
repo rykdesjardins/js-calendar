@@ -43,6 +43,8 @@
     border-bottom: 1px solid #DDD;
     background-color: #F1F1F1;
     font-size: 14px;
+
+    cursor: pointer;
 }
 
 .cal-week-day-sep:first-child {
@@ -135,6 +137,16 @@
     cursor: pointer;
 
     border-bottom: 1px dashed #EEE;
+}
+
+.cell-number.not-in-month {
+    font-size: 12px;
+    color: #CCC;
+}
+
+.notinmonth {
+    background: #F6F6F6;
+    opacity: 0.5;
 }
 
 .js-cal-weekday {
