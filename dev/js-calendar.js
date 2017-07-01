@@ -130,16 +130,28 @@ class JSCalendarEvent {
 
     dragging() {
         this.monthElem.classList.add('dragged');
+        this.weekElem.classList.add('dragged');
         this.calendar.dragging(this);
     }
 
     dropped() {
         this.monthElem.classList.remove('dragged');
+        this.weekElem.classList.remove('dragged');
         this.calendar.dropped(this);
     }
 
     bindEvents() {
         this.monthElem && this.monthElem.addEventListener('mousedown', () => {
+            let finish = () => {
+                window.removeEventListener('mouseup', finish);
+                this.dropped();
+            };
+            window.addEventListener('mouseup', finish);
+            
+            this.dragging();
+        });
+
+        this.weekElem && this.weekElem.addEventListener('mousedown', () => {
             let finish = () => {
                 window.removeEventListener('mouseup', finish);
                 this.dropped();
@@ -253,7 +265,9 @@ class JSCalendar {
             }
         } else if (this.state.view == "week") {
             this.state.day -= 7;
-            if (this.state.day < 0) {
+            this.state.day = this.state.day - (this.state.day % 7);
+
+            if (this.state.day <= 0) {
                 this.state.month--;
                 if (this.state.month == -1) {
                     this.state.month = 11;
@@ -261,7 +275,7 @@ class JSCalendar {
                 }
 
                 let monthStat = JSCalendar.getDaysInMonth(this.state.year, this.state.month)
-                this.state.day = monthStat.numberOfDays;
+                this.state.day = monthStat.numberOfDays + this.state.day;
             }
         }
 
@@ -439,16 +453,26 @@ class JSCalendar {
             daysep.textContent = this.options.daysVocab[cDay.getDay()] + ", " +
                 this.options.monthsVocab[cDay.getMonth()] + " " + cDay.getDate();
 
+            let daycontainer = _a('div', "col-week-day-container", daycol);
             if (this.state.matrix[row][i] && this.state.matrix[row][i].length !== 0) {
                 let events = this.state.matrix[row][i];
                 for (let j = 0; j < events.length; j++) {
                     let event = events[j];
-                    event.render(this.state.view, daycol);
+                    event.render(this.state.view, daycontainer);
                 }
-            } else {
-                let eventCol = _a("div", "cal-week-day-no-event-col", daycol);
-                eventCol.textContent = this.options.emptyDayVocab;
             }
+
+            daycontainer.dataset.row = row;
+            daycontainer.dataset.col = i;
+            daycontainer.addEventListener('mouseenter', () => {
+                if (this.state.dragging) {
+                    daycontainer.appendChild(this.state.dragged.weekElem);
+                    this.state.newPosition = [daycontainer.dataset.row, daycontainer.dataset.col];
+                }
+            });
+
+            let eventCol = _a("div", "cal-week-day-no-event-col", daycontainer);
+            eventCol.textContent = this.options.emptyDayVocab;
 
             cDay = new Date(cDay.getTime() + daystamp);
         }

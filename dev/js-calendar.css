@@ -49,11 +49,17 @@
     border-top: none;
 }
 
+.cal-week-day-no-event-col:only-child {
+    display: block;;
+}
+
 .cal-week-day-no-event-col {
     text-align: center;
     padding: 15px;
     font-size: 16px;
     color: #BBB;
+
+    display: none;
 }
 
 .cal-week-day-time-float {
@@ -72,6 +78,9 @@
 .cal-week-day-event-col {
     position: relative;
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.2);
+    
+    cursor: move;
+    cursor: -webkit-grab;
 }
 
 .cell-event-mark {
@@ -89,6 +98,7 @@
     cursor: -webkit-grab;
 }
 
+.cal-week-day-event-col.dragged,
 .cell-event-mark.dragged {
     border-style : dashed;
     opacity : 0.5;
