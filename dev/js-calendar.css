@@ -85,6 +85,9 @@
     border-radius: 2px;
 
     box-shadow: 0px 0px 3px 1px rgba(0,0,0,0.1);
+
+    cursor: move;
+    cursor: -webkit-grab;
 }
 
 .cal-total-day-event-view.no-time {
@@ -93,6 +96,10 @@
 
 .cal-total-day-event-view.no-time:last-child {
     margin-bottom: 5px;
+}
+
+.cal-total-day-event-view.dragged {
+    opacity: 0.5;
 }
 
 .cal-total-day-time {

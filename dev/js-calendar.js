@@ -22,6 +22,7 @@ class JSCalendarEvent {
         this.options = calendar.options;
         this.calendar = calendar;
         this.buildElements();
+        this.updateElements();
         this.bindEvents();
     }
 
@@ -54,7 +55,7 @@ class JSCalendarEvent {
         let append = "";
         if (this.options.ampm) {
             if (h > 11) {
-                h -= 12;
+                h -= h == 12 ? 0 : 12;
                 append = " PM";
             } else {
                 append = " AM";
@@ -65,9 +66,15 @@ class JSCalendarEvent {
     }
 
     buildElements() {
-        let monthElem = _a('div', 'cell-event-mark');
-        let weekElem = _a("div", "cal-week-day-event-col");
-        let dayElem = _a("div", "cal-total-day-event-view");
+        this.monthElem = _a('div', 'cell-event-mark');
+        this.weekElem = _a("div", "cal-week-day-event-col");
+        this.dayElem = _a("div", "cal-total-day-event-view");
+    }
+
+    updateElements() {
+        let monthElem = this.monthElem;
+        let weekElem = this.weekElem;
+        let dayElem = this.dayElem;
 
         // Month element
         if (this.at) {
@@ -109,7 +116,7 @@ class JSCalendarEvent {
                 outputString += " - " + this.formatTime(end);
             }
 
-            let timefloat = _a('span', 'cal-week-day-time-float', weekElem);
+            let timefloat = weekElem.querySelector(".cal-week-day-time-float") || _a('span', 'cal-week-day-time-float', weekElem);
             timefloat.textContent = outputString;
         }
 
@@ -135,26 +142,22 @@ class JSCalendarEvent {
         dayElem.style.height = this.gapcount * this.options.dayviewGapHeight - 2 + "px";
 
         if (this.at) {
-            dayElem.style.top = this.gapcell * this.options.dayviewGapHeight + "px";
+            this.daytop = this.gapcell * this.options.dayviewGapHeight;
+
+            dayElem.style.top = this.daytop + "px";
             dayElem.style.right = "0px";
             dayElem.style.left = "0px";
             dayElem.style.zIndex = Math.floor(this.gapcell);
-        } else {
-
         }
 
-        let dayText = _a('div', 'cal-total-day-displayname', dayElem);
+        let dayText = dayElem.querySelector(".cal-total-day-displayname") || _a('div', 'cal-total-day-displayname', dayElem);
         dayText.textContent = this.displayname || this.options.nonameEventVocab;
 
         if (this.at) {
-            let timeText = _a('div', 'cal-total-day-time', dayElem);
+            let timeText = dayElem.querySelector(".cal-total-day-time") || _a('div', 'cal-total-day-time', dayElem);
             timeText.textContent = this.formatTime(new Date(this.at)) + (this.formatDuration(this.duration, ', '));
         }
 
-        // Final affectation
-        this.monthElem = monthElem;
-        this.weekElem = weekElem;
-        this.dayElem = dayElem;
     }
 
     getDayGap() {
@@ -164,12 +167,14 @@ class JSCalendarEvent {
     dragging() {
         this.monthElem.classList.add('dragged');
         this.weekElem.classList.add('dragged');
+        this.dayElem.classList.add('dragged');
         this.calendar.dragging(this);
     }
 
     dropped() {
         this.monthElem.classList.remove('dragged');
         this.weekElem.classList.remove('dragged');
+        this.dayElem.classList.remove('dragged');
         this.calendar.dropped(this);
     }
 
@@ -192,6 +197,29 @@ class JSCalendarEvent {
             window.addEventListener('mouseup', finish);
             
             this.dragging();
+        });
+
+        this.dayElem.addEventListener('mousedown', (ev) => {
+            let finish = () => {
+                window.removeEventListener('mouseup', finish);
+                this.dropped();
+            };
+            window.addEventListener('mouseup', finish);
+            
+            this.originalY = ev.y;
+            this.dragging();
+        });
+
+        this.monthElem.addEventListener('click', () => {
+            this.calendar.fire("click", this);
+        });
+
+        this.weekElem.addEventListener('click', () => {
+            this.calendar.fire("click", this);
+        });
+
+        this.dayElem.addEventListener('click', () => {
+            this.calendar.fire("click", this);
         });
     }
 
@@ -499,6 +527,14 @@ class JSCalendar {
             e.render(this.state.view, noTimeWrap);
         });
 
+        eventwrap.addEventListener('mousemove', (ev) => {
+            if (this.state.dragging) {
+                let top = this.state.dragged.daytop - (this.state.dragged.originalY - ev.y);
+                this.state.dragged.dayElem.style.top = top + "px";
+                this.state.dragged.potentialnewtop = top;
+            }
+        });
+
         // Loop through hours
         let minGap = this.options.dayviewGapMinutes;
         let gapsPerHour = Math.ceil(60 / minGap);
@@ -574,7 +610,11 @@ class JSCalendar {
             });
         }
 
-        this.tablewrapper.scrollTop = smallestGap * this.options.dayviewGapHeight;
+        if (this.state.skipscroll) {
+            this.state.skipscroll = false; 
+        } else {
+            this.tablewrapper.scrollTop = smallestGap * this.options.dayviewGapHeight;
+        }
     } 
 
     renderWeek() {
@@ -768,7 +808,32 @@ class JSCalendar {
         let newPos = this.state.newPosition;
 
         this.fire('cellMightMove', ev);
-        if (newPos && newPos != oldPos) {
+        if (this.state.view == "day") {
+            let ev = this.state.dragged;
+            let newtop = ev.potentialnewtop;
+            newtop = newtop - (newtop % this.options.dayviewGapHeight);
+    
+            let newgap = newtop / this.options.dayviewGapHeight;
+
+            if (newgap != ev.gapcell) {
+                ev.gapcell = newgap;
+                ev.dayElem.style.top = newtop + "px";
+                ev.daytop = newtop;
+                
+                let totalMinutes = newgap * this.options.dayviewGapMinutes;
+                let oldat = ev.at;
+                ev.at = new Date(this.state.year, this.state.month, this.state.day, 0, totalMinutes);
+                ev.updateElements();
+
+                this.fire('cellMoved', {event : ev, oldtime : oldat, newtime : ev.at});
+                this.state.skipscroll = true;
+                this.render();
+            } else {
+                ev.dayElem.style.top = newtop + "px";
+                this.fire('cellDidNotMove', {event : ev, reason : new Error("Distance between click and drop not big enough")});
+            }
+
+        } else if (newPos && newPos != oldPos) {
             this.fire('cellWillMove', {event : ev, oldPosition : oldPos, newPosition : newPos});
             let oldPosObj = oldPos.split('-');
             let newPosObj = newPos.split('-');
