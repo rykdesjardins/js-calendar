@@ -1,6 +1,7 @@
 # JSCalendar
-The lightest Javascript calendar out there, without any dependency (no jQuery). 
-This is a work in progress, but it is ready to be used in production.
+The lightest Javascript calendar out there, without any dependency (no jQuery). This is a work in progress, but it is ready to be used in production.
+
+The development files are using es2016, so I used babel with the es2015 preset and babily to minify the whole thing. Distribution files can be found under `./dist/`. There are both normal and minified files. 
 
 ## Sailor's honour
 If other kind developers want to lend a hand, I will obviously stop pushing directly to master and switch to a dev branch ;)
