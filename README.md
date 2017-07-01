@@ -1,6 +1,6 @@
 # JSCalendar
 The lightest Javascript calendar out there, without any dependency (no jQuery). 
-This is a work in progress, so it is not ready to be used in production.
+This is a work in progress, but it is ready to be used in production.
 
 ## Sailor's honour
 This will be finished soon. It is needed for a bigger project anyways. If other kind developers want to lend a hand, I will obviously stop pushing directly to master and switch to a dev branch ;)
@@ -79,6 +79,98 @@ JSCalendar.on('eventName', (calendar, extra) => {
 | fetched | Fired after receiving data from the data source. |
 | viewWillChange | Fired before rendering a new view (month, week, day). |
 | viewChanged | Fired after changing view. This will not fire if the view was set to the current one (wasn't changed). |
+
+## Static functions
+Those can be called using the class directly
+```javascript
+// Will instanciate all calendars found under a certain wrapper
+JSCalendar.find(document.getElementById("calendar-area"));
+
+// Will return an instance of a calendar automatically generated using JSCalendar.find()
+JSCalendar.getInstance(instanceid);
+
+// Fires an event to all calendars from a specified instance
+JSCalendar.fire(event, instance, extra);
+
+/* 
+    Returns an object : 
+    { 
+        numberOfDays : number,  // Total number of days in the month
+        firstDay : number       // Week day of the 1st of the month
+    }
+*/
+JSCalendar.getDaysInMonth(year, month);
+```
+
+## Instance functions
+Associated with all JSCalendar instanciated objects
+```javascript
+// Must be called after instanciating
+calendar.init(callback)
+
+// Previous, today, next
+// Those are called when pressing the direction buttons on the top bar
+calendar.goBack();
+calendar.goNow();
+calendar.goNext();
+
+// Adding an item to the matrix
+/*
+    The first parameter is an object : 
+    {
+        at : Date,
+        event : JSCalendarEventTemplate { 
+            at : Date, 
+            displayname : string, 
+            duration : number,  
+            color : string
+        }
+    }
+*/
+push(event);
+
+// Destroy calendar reference
+destroy();
+
+// Switch from current view to another
+/*
+    First parameter is on of the following strings : 
+        month
+        week
+        day
+*/
+setView(view);
+
+// Refresh and rebuild current view
+render();
+
+// Merge a new matrix into the current state matrix
+/*
+    A matrix is an object formatted like the following :
+    matrix[year][month][day] = [JSCalendarEventTemplate];
+    
+    The second parameter is a flag (true|false). If true, 
+    the calendar will render after setting the new matrix
+*/
+appendMatrix(matrix, rerender);
+
+// Set the current state matrix, and destroy the old one if any
+setMatrix(matrix, rerender);
+
+// If a data source is specified, fetch a new matrix to append
+/*
+    This will request to the data source specified with query parameters
+    like the following : 
+    year = current state year
+    month = current state month
+    day = current state day
+    
+    Once finished, the provided callback will be executed
+    The second parameter is a flag (true|false), if set to true, will
+    fetch even is a cached version of the matrix exists.
+*/
+fetch(callback, force);
+```
 
 ## More screenshots
 
