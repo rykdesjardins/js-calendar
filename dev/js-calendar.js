@@ -33,6 +33,19 @@ class JSCalendarEvent {
         this.html = data.html;
     }
 
+    formatDuration(d, append = "", prepend = "") {
+        if (!d) {
+            return "";
+        }
+
+        d = Math.floor(d / 1000 / 60);
+        
+        let h = Math.floor(d / 60);
+        let m = d % 60;
+
+        return append + (h ? (h + "h ") : "") + (m ? (m + "mins") : "") + prepend;
+    }
+
     formatTime(t) {
         let h = t.getHours();
         let m = t.getMinutes();
@@ -103,32 +116,49 @@ class JSCalendarEvent {
         // Day element
         let gapMinuteSize = this.options.dayviewGapMinutes;
         let gapsPerHour = 60 / gapMinuteSize;
+
+        this.gapcell = -1;
         if (this.at) {
-            let gap = this.at.getHours() * gapsPerHour;
-            gap += this.at.getMinutes() * gapMinuteSize;
-            dayElem.dataset.gapcell = gap; 
+            this.gapcell = (this.at.getHours() * gapsPerHour) + (this.at.getMinutes() / gapMinuteSize);
         } else {
-            dayElem.dataset.gapcell = -1;
             dayElem.classList.add("no-time");
         }
 
+        this.gapcount = this.options.dayviewNoTimeGapSize;
         if (this.duration) {
-            dayElem.dataset.gapcount = Math.ceil(this.duration / 1000 / 60 / gapMinuteSize);
+            this.gapcount = Math.ceil(this.duration / 1000 / 60 / gapMinuteSize);
         } else {
-            dayElem.dataset.gapcount = 1;
             dayElem.classList.add("no-duration");
         }
 
         dayElem.style.background = this.color || this.options.eventBackground;
+        dayElem.style.height = this.gapcount * this.options.dayviewGapHeight - 2 + "px";
 
-        let dayText = _a('span', 'cal-total-day-displayname', dayElem);
+        if (this.at) {
+            dayElem.style.top = this.gapcell * this.options.dayviewGapHeight + "px";
+            dayElem.style.right = "0px";
+            dayElem.style.left = "0px";
+            dayElem.style.zIndex = Math.ceil(this.gapcell);
+        } else {
+
+        }
+
+        let dayText = _a('div', 'cal-total-day-displayname', dayElem);
         dayText.textContent = this.displayname || this.options.nonameEventVocab;
-        
+
+        if (this.at) {
+            let timeText = _a('div', 'cal-total-day-time', dayElem);
+            timeText.textContent = this.formatTime(new Date(this.at)) + (this.formatDuration(this.duration, ', '));
+        }
 
         // Final affectation
         this.monthElem = monthElem;
         this.weekElem = weekElem;
         this.dayElem = dayElem;
+    }
+
+    getDayGap() {
+        return this.gapcell;
     }
 
     dragging() {
@@ -245,6 +275,7 @@ class JSCalendar {
         this.state.month = now.getMonth();
         this.state.day = now.getDate();
         this.state.weekday = now.getDay();
+        this.adjustDateToView();
 
         this.render();
     }
@@ -337,24 +368,15 @@ class JSCalendar {
 
     push(item) {
         this.fire('willPush', item);
-        let date = new Date(item.at);
 
-        if (date.getMonth() == this.state.month && date.getFullYear() == this.state.year) {
-            let monthStat = JSCalendar.getDaysInMonth(this.state.year, this.state.month);
-            let startAt = monthStat.firstDay;
-
-            let index = date.getDate() + startAt - 1;
-            let row = Math.floor(index / 7);
-            let col = index % 7;
-
-            let arr = this.state.matrix[row][col];
-            if (!arr) {
-                arr = [];
-                this.state.matrix[row][col] = arr;
-            }
-
-            arr.push(item);
-            this.render();
+        if (item.at) {
+            let date = new Date(item.at);
+            this.validateCell(date.getFullYear(), date.getMonth(), date.getDate());
+            this.state.matrix[date.getFullYear()][date.getMonth()][date.getDate()].push(
+                new JSCalendarEvent(
+                    item.event, this, date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate()
+                )
+            ); 
 
             this.fire('pushed', item);
         } else {
@@ -470,6 +492,8 @@ class JSCalendar {
         this.validateCell();
         let events = this.state.matrix[this.state.year][this.state.month][this.state.day];
         let noTimeWrap = _a('div', 'single-day-no-time-wrap', daycol);
+        let timetable = _a('div', 'single-day-time-table', daycol);
+        let eventwrap = _a('div', 'cal-total-day-event-wrap', timetable);
 
         events.filter(e => !e.at).forEach(e => {
             e.render(this.state.view, noTimeWrap);
@@ -478,11 +502,70 @@ class JSCalendar {
         // Loop through hours
         let minGap = this.options.dayviewGapMinutes;
         let gapsPerHour = Math.ceil(60 / minGap);
+        let gapindex = 0;
         for (let h = 0; h < 24; h++) {
-            let hourBlock = _a('div', 'hour-block', daycol);
-            let timespan = _a('span', 'hour-block-time', hourBlock);
-            timespan.textContent = h + ":00";
+            for (let gapi = 0; gapi < gapsPerHour; gapi++) {
+                let minutesBlock = _a('div', 'hour-block gap-' + (++gapindex), timetable);
+                let timespan = _a('span', 'minutes-block-time', minutesBlock);
+                
+                minutesBlock.classList.add(gapi == 0 ? "hour-gap" : "minutes-gap")
+                
+                let mins = gapi * minGap;
+                let dh = h;
+                let appendee = "";
+                minutesBlock.style.height = (this.options.dayviewGapHeight - 1) + "px";
+                if (this.options.ampm) {
+                    if (h < 12) {
+                        appendee = "AM";
+                    } else {
+                        dh-= dh == 12 ? 0 : 12;
+                        appendee = "PM";
+                    }
+                }
+                timespan.textContent = dh + ":" + (mins < 10 ? "0" : "") + mins + appendee;
+
+                minutesBlock.dataset.gapindex = gapindex;
+            }
         }
+
+        let groups = {};
+        let smallestGap = -1;
+        events.filter(e => e.at).forEach(e => {
+            e.render(this.state.view, eventwrap);
+
+            let totalgaps = e.gapcount;
+            if (Math.floor(e.gapcell) != e.gapcell) {
+                totalgaps++;
+            }
+
+            for (let i = 0; i < totalgaps; i++) {
+                let g = Math.floor(e.gapcell+i)
+                if (!groups[g]) {
+                    groups[g] = [];
+                }
+    
+                groups[g].push(e);
+            }
+
+            if (smallestGap == -1 || smallestGap > e.gapcell) {
+                smallestGap = e.gapcell;
+            }
+        });
+
+        for (let gap in groups) {
+            let total = groups[gap].length;
+            let ratio = 100 / total;
+            let index = 0;
+
+            groups[gap].forEach(e => {
+                e.dayElem.style.left = index * ratio + "%";
+                e.dayElem.style.right = ratio * (total - index - 1) + "%";
+    
+                index++;
+            });
+        }
+
+        this.tablewrapper.scrollTop = smallestGap * this.options.dayviewGapHeight;
     } 
 
     renderWeek() {
@@ -975,7 +1058,9 @@ class JSCalendar {
             globalSelector : ".js-calendar",
             eventBackground : "rgb(126, 156, 193)",
             titleCropSize : 20,
-            dayviewGapMinutes : 5,
+            dayviewGapMinutes : 30,
+            dayviewNoTimeGapSize : 2,
+            dayviewGapHeight: 38,
             datasource : "",
             datasourceHeaders : {},
             ampm : true,

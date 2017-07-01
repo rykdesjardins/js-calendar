@@ -47,6 +47,73 @@
     cursor: pointer;
 }
 
+.single-day-time-table {
+    position: relative;
+}
+
+.hour-block {
+    font-size: 12px;
+    font-weight: bold;
+    color: #999;
+    border-bottom: 1px solid #E9E9E9;
+}
+
+.minutes-block-time, 
+.hour-block-time {
+    margin: 1px 2px;
+}
+
+.single-day-no-time-wrap {
+    position: relative;
+}
+
+.cal-total-day-event-wrap {
+    position: absolute;
+    top:0;
+    left:60px;
+    right: 1px;
+    bottom: 0px;
+}
+
+.cal-total-day-event-view {
+    position: absolute;
+    top: 0px;
+    color: #FFF;
+    font-size: 14px;
+
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+
+    box-shadow: 0px 0px 3px 1px rgba(0,0,0,0.1);
+}
+
+.cal-total-day-event-view.no-time {
+    position: relative;
+}
+
+.cal-total-day-event-view.no-time:last-child {
+    margin-bottom: 5px;
+}
+
+.cal-total-day-time {
+    position: absolute;
+    top: 20px;
+    left: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.cal-total-day-displayname {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+}
+
+.hour-block.minutes-gap {
+    font-weight: normal;
+    color: #BBB;
+}
+
 .cal-week-day-sep:first-child {
     border-top: none;
 }
