@@ -80,4 +80,4 @@ JSCalendar.on('eventName', (calendar, extra) => {
 ![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-day.jpg "Screenshot of provided demo in example.html")
 
 ## Week view
-![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-week.png "Screenshot of provided demo in example.html")
+![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-week.jpg "Screenshot of provided demo in example.html")
