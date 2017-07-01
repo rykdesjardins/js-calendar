@@ -74,3 +74,11 @@ JSCalendar.on('eventName', (calendar, extra) => {
 | fetched | Fired after receiving data from the data source. |
 | viewWillChange | Fired before rendering a new view (month, week, day). |
 | viewChanged | Fired after changing view. This will not fire if the view was set to the current one (wasn't changed). |
+
+
+## No conflicts with overlapping events
+![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-day.jpg "Screenshot of provided demo in example.html")
+
+## Week view
+![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-week.png "Screenshot of provided demo in example.html")
+
