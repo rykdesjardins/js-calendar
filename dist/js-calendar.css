@@ -1,0 +1,289 @@
+.calendar-wrapper {
+    overflow: auto;
+}
+
+.js-calendar {
+    font-family: "Arial";
+
+    -webkit-touch-callout: none; 
+    -webkit-user-select: none; 
+    -khtml-user-select: none; 
+    -moz-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none; 
+}
+
+.js-calendar.dragging {
+    cursor : -webkit-grabbing;
+}
+
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #DDD;
+}
+
+.jscal-row {
+
+}
+
+.jscal-col {
+    border-collapse: collapse;
+    border: 1px solid #DDD;
+    vertical-align: top;
+}
+
+.cal-week-day-col {
+    padding: 0px;
+}
+
+.cal-week-day-sep {
+    padding: 10px;
+    border-top: 1px solid #DDD;
+    border-bottom: 1px solid #DDD;
+    background-color: #F1F1F1;
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+.single-day-time-table {
+    position: relative;
+}
+
+.hour-block {
+    font-size: 12px;
+    font-weight: bold;
+    color: #999;
+    border-bottom: 1px solid #E9E9E9;
+}
+
+.minutes-block-time, 
+.hour-block-time {
+    margin: 1px 2px;
+}
+
+.single-day-no-time-wrap {
+    position: relative;
+}
+
+.cal-total-day-event-wrap {
+    position: absolute;
+    top:0;
+    left:60px;
+    right: 1px;
+    bottom: 0px;
+}
+
+.cal-total-day-event-view {
+    position: absolute;
+    top: 0px;
+    color: #FFF;
+    font-size: 14px;
+
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+
+    box-shadow: 0px 0px 3px 1px rgba(0,0,0,0.1);
+
+    cursor: move;
+    cursor: -webkit-grab;
+}
+
+.cal-total-day-event-view.no-time {
+    position: relative;
+}
+
+.cal-total-day-event-view.no-time:last-child {
+    margin-bottom: 5px;
+}
+
+.cal-total-day-event-view.dragged {
+    opacity: 0.5;
+}
+
+.cal-total-day-time {
+    position: absolute;
+    top: 20px;
+    left: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.cal-total-day-displayname {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+}
+
+.hour-block.minutes-gap {
+    font-weight: normal;
+    color: #BBB;
+}
+
+.cal-week-day-sep:first-child {
+    border-top: none;
+}
+
+.cal-week-day-no-event-col:only-child {
+    display: block;;
+}
+
+.cal-week-day-no-event-col {
+    text-align: center;
+    padding: 15px;
+    font-size: 16px;
+    color: #BBB;
+
+    display: none;
+}
+
+.cal-week-day-time-float {
+    position: absolute;
+    left: 0;
+    font-size: 12px;
+    padding: 4px 6px;
+    background-color: rgba(0,0,0,0.2);
+    bottom: 0;
+    border-top-right-radius: 2px;
+    text-align: center;
+    font-weight: bold;
+    color: #EEE;
+}
+
+.cal-week-day-event-col {
+    position: relative;
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.2);
+    
+    cursor: move;
+    cursor: -webkit-grab;
+}
+
+.cell-event-mark {
+    display: block;
+    font-size: 12px;
+    padding: 2px;
+    background: rgb(126, 156, 193);
+    color: #FFF;
+    border-radius: 3px;
+    margin: 0px 2px 2px;
+
+    border: 1px solid rgba(0,0,0,0.2);
+
+    cursor: move;
+    cursor: -webkit-grab;
+}
+
+.cal-week-day-event-col.dragged,
+.cell-event-mark.dragged {
+    border-style : dashed;
+    opacity : 0.5;
+    cursor : -webkit-grabbing;
+}
+
+.cal-week-day-event-col.text-injected {
+    padding: 10px;
+    background: rgb(126, 156, 193);
+    color: #FFF;
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    margin: 5px;
+}
+
+.cal-week-day-event-col.not-injected {
+    color: #EEE;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    font-style: italic;
+    margin: 5px;
+}
+
+.cell-number {
+    display: block;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 2px;
+
+    color: #999;
+    cursor: pointer;
+
+    border-bottom: 1px dashed #EEE;
+}
+
+.cell-number.not-in-month {
+    font-size: 12px;
+    color: #CCC;
+}
+
+.notinmonth {
+    background: #F6F6F6;
+    opacity: 0.5;
+}
+
+.js-cal-weekday {
+    text-align: center;
+    font-size: 12px;
+    height: 22px;
+    color: #555;
+}
+
+.control-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0px 6px;
+    color: #555;
+
+    cursor: pointer;
+}
+
+.control-button.active {
+    color: #000;
+    text-decoration: underline;
+}
+
+.jscal-col.cell-today {
+    background-color: #EEF;
+}
+
+.jscal-col.cell-today .cell-number {
+    background-color: #EEF;
+}
+
+.control-bar-widget {
+    height: 30px;
+}
+
+.control-bar-views {
+    float: left;
+}
+
+.control-bar-actions {
+    float: right;
+}
+
+.control-bar-title {
+    float: none;
+    text-align: center;
+    padding-top: 2px;
+    margin-bottom: -2px;
+}
+
+.calendar-wrapper::-webkit-scrollbar-track
+{
+    background-color: #F6F6F6;
+}
+
+.calendar-wrapper::-webkit-scrollbar
+{
+    width: 4px;
+    background-color: #EEE;
+}
+
+.calendar-wrapper::-webkit-scrollbar-thumb
+{
+    background-color: #AAA;
+}
