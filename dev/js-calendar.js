@@ -302,7 +302,7 @@ class JSCalendar {
         this.state.weekday = now.getDay();
         this.adjustDateToView();
 
-        this.render();
+        return this.render();
     }
 
     goBack() {
@@ -341,7 +341,7 @@ class JSCalendar {
             }
         }
 
-        this.render();
+        return this.render();
     }
 
     goNext() {
@@ -378,7 +378,7 @@ class JSCalendar {
             }
         }
 
-        this.render();
+        return this.render();
     }
 
     goToDay(position) {
@@ -474,6 +474,8 @@ class JSCalendar {
             this.render();
             this.fire('viewChanged');
         }
+
+        return this;
     }
 
     render() {
