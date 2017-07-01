@@ -207,6 +207,7 @@ class JSCalendarEvent {
             window.addEventListener('mouseup', finish);
             
             this.originalY = ev.y;
+            this.potentialnewtop = this.daytop;
             this.dragging();
         });
 
@@ -215,10 +216,6 @@ class JSCalendarEvent {
         });
 
         this.weekElem.addEventListener('click', () => {
-            this.calendar.fire("click", this);
-        });
-
-        this.dayElem.addEventListener('click', () => {
             this.calendar.fire("click", this);
         });
     }
@@ -807,9 +804,16 @@ class JSCalendar {
         let oldPos = ev.position;
         let newPos = this.state.newPosition;
 
+        if (!ev) {
+            return this.fire("cellDidNotMove", {event : ev, reason : new Error("moveCell was fired without an event")})
+        }
+
         this.fire('cellMightMove', ev);
-        if (this.state.view == "day" && ev.potentialnewtop) {
-            let ev = this.state.dragged;
+        if (this.state.view == "day") {
+            if (!ev.potentialnewtop || ev.potentialnewtop == ev.daytop) {
+                return this.fire("click", ev);
+            }
+
             let newtop = ev.potentialnewtop;
             newtop = newtop - (newtop % this.options.dayviewGapHeight);
     
