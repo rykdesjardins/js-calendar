@@ -12,7 +12,7 @@ var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 ```
 
 ## Simple design and fast rendering
-![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss.png "Screenshot of provided demo in example.html")
+![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-month.jpg "Screenshot of provided demo in example.html")
 
 ## Options
 | Option name | Usage | Default |
