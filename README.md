@@ -103,18 +103,19 @@ JSCalendar.getDaysInMonth(year, month);
 ```
 
 ## Instance functions
-Associated with all JSCalendar instanciated objects
+Associated with all JSCalendar instanciated objects. Chainable functions return "this" so you can chain multiple functions on one line.
 ```javascript
-// Must be called after instanciating
+// Must be called after instanciating [chainable]
 calendar.init(callback)
 
-// Previous, today, next
-// Those are called when pressing the direction buttons on the top bar
+// Previous, today, next [chainable]
+// Those are called when pressing the direction buttons on the top bar. 
+// The calendar will be rendered at the end
 calendar.goBack();
 calendar.goNow();
 calendar.goNext();
 
-// Adding an item to the matrix
+// Adding an item to the matrix [chainable]
 /*
     The first parameter is an object : 
     {
@@ -127,24 +128,24 @@ calendar.goNext();
         }
     }
 */
-push(event);
+calendar.push(event);
 
-// Destroy calendar reference
-destroy();
+// Destroy calendar reference [chainable]
+calendar.destroy();
 
-// Switch from current view to another
+// Switch from current view to another [chainable]
 /*
     First parameter is on of the following strings : 
         month
         week
         day
 */
-setView(view);
+calendar.setView(view);
 
-// Refresh and rebuild current view
-render();
+// Refresh and rebuild current view [chainable]
+calendar.render();
 
-// Merge a new matrix into the current state matrix
+// Merge a new matrix into the current state matrix [chainable]
 /*
     A matrix is an object formatted like the following :
     matrix[year][month][day] = [JSCalendarEventTemplate];
@@ -152,12 +153,12 @@ render();
     The second parameter is a flag (true|false). If true, 
     the calendar will render after setting the new matrix
 */
-appendMatrix(matrix, rerender);
+calendar.appendMatrix(matrix, rerender);
 
-// Set the current state matrix, and destroy the old one if any
-setMatrix(matrix, rerender);
+// Set the current state matrix, and destroy the old one if any [chainable]
+calendar.setMatrix(matrix, rerender);
 
-// If a data source is specified, fetch a new matrix to append
+// If a data source is specified, fetch a new matrix to append [chainable]
 /*
     This will request to the data source specified with query parameters
     like the following : 
@@ -169,7 +170,7 @@ setMatrix(matrix, rerender);
     The second parameter is a flag (true|false), if set to true, will
     fetch even is a cached version of the matrix exists.
 */
-fetch(callback, force);
+calendar.fetch(callback, force);
 ```
 
 ## More screenshots
