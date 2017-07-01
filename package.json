@@ -1,0 +1,28 @@
+{
+  "name": "js-calendar",
+  "version": "1.0.3",
+  "description": "The lightest Javascript calendar out there, without any dependency (no jQuery).",
+  "main": "dist/js-calendar.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rykdesjardins/js-calendar.git"
+  },
+  "keywords": [
+    "calendar",
+    "date",
+    "javascript",
+    "frontend",
+    "no-dependencies",
+    "vanilla-javascript",
+    "agenda"
+  ],
+  "author": "Erik Desjardins",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rykdesjardins/js-calendar/issues"
+  },
+  "homepage": "https://github.com/rykdesjardins/js-calendar#readme"
+}
