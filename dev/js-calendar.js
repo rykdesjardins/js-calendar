@@ -1,4 +1,4 @@
-var log = function(msg) {
+_jscallog = function(msg) {
     console.log(`[JSCalendar - ${new Date().toLocaleTimeString()}] ${msg}`);
 };
 
@@ -251,7 +251,7 @@ class JSCalendar {
     }
 
     init(done) {
-        log("Created new instance with id : " + this.id);
+        _jscallog("Created new instance with id : " + this.id);
         this.fire('init');
         this.createStructure();
 
@@ -419,7 +419,7 @@ class JSCalendar {
     }
 
     fire(event, extra) {
-        log(`Firing event '${event}'`);
+        _jscallog(`Firing event '${event}'`);
         JSCalendar.fire(event, this, extra);
 
         let events = this.hooks[event] || [];
@@ -480,7 +480,7 @@ class JSCalendar {
 
     render() {
         this.fire("willRender");
-        log("Rendering instance " + this.id);
+        _jscallog("Rendering instance " + this.id);
         let benchStart = Date.now();
 
         this.fetch(() => {
@@ -503,7 +503,7 @@ class JSCalendar {
             this.updateControls();
             this.fire("rendered");
 
-            log(`Rendering benchmark : ${Date.now()-benchStart}ms`);
+            _jscallog(`Rendering benchmark : ${Date.now()-benchStart}ms`);
         });
 
         return this;
@@ -630,7 +630,7 @@ class JSCalendar {
         this.validateCell(firstDay.getFullYear(), firstDay.getMonth(), firstDay.getDate());
         this.validateCell(lastDay.getFullYear(), lastDay.getMonth(), lastDay.getDate());
 
-        log("Rending matrix week");
+        _jscallog("Rending matrix week");
         let cDay = new Date(firstDay.getTime());
         for (let i = 0; i < 7; i++) {
             let y = cDay.getFullYear();
@@ -916,7 +916,7 @@ class JSCalendar {
     }
 
     setMatrix(matrix, rerender) {
-        log("Setting new matrix to instance " + this.id);
+        _jscallog("Setting new matrix to instance " + this.id);
         this.fire('matrixWillSet');
         if (!matrix) {
             matrix = JSCalendar.defaultMatrix();
@@ -938,7 +938,7 @@ class JSCalendar {
             }
         }
 
-        log("No problem setting new matrix to instance " + this.id);
+        _jscallog("No problem setting new matrix to instance " + this.id);
         this.fire('matrixSet');
         this.state.matrixmonth = this.state.month;
         rerender && this.render();
@@ -969,7 +969,7 @@ class JSCalendar {
 
     fetch(done, force) {
         if (!force && this.state.matrix[this.state.year] && this.state.matrix[this.state.year][this.state.month]) {
-            log("Loading matrix from local cache");
+            _jscallog("Loading matrix from local cache");
             done && done();
         } else if (this.options.datasource) {
             this.fire('willFetch');
@@ -999,27 +999,27 @@ class JSCalendar {
                         this.fire('fetched', maybeMatrix);
 
                         if (this.appendMatrix(maybeMatrix)) {
-                            log("Updated matrix from data source")
+                            _jscallog("Updated matrix from data source")
                             done && done(undefined, maybeMatrix);
                         } else {
-                            log("Received invalid matrix with size : " + maybeMatrix.length)
+                            _jscallog("Received invalid matrix with size : " + maybeMatrix.length)
                             done && done(new Error("Invalid matrix size"), maybeMatrix);
                         }
                     } catch (err) {
-                        log("Caught error during matrix parsing : " + err);
+                        _jscallog("Caught error during matrix parsing : " + err);
                         done && done(err);
                     }
                 } else if (request.status && request.status != 200) {
-                    log("Received non-200 HTTP response code : " + request.status);
+                    _jscallog("Received non-200 HTTP response code : " + request.status);
                     done && done(new Error("Non-200 HTTP response code : " + request.status), request.status);
                 }
             };
 
-            log("Sending async request to data source : " + this.options.datasource);
+            _jscallog("Sending async request to data source : " + this.options.datasource);
             request.open('GET', url);
             request.send();
         } else {
-            log("Created new entry in matrix for " + this.state.year + "/" + this.state.month);
+            _jscallog("Created new entry in matrix for " + this.state.year + "/" + this.state.month);
             if (!this.state.matrix[this.state.year]) {
                 this.state.matrix[this.state.year] = {
                     0 : {}, 1 : {}, 2 : {}, 3 : {}, 4 : {}, 5 : {}, 

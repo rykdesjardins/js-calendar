@@ -23,7 +23,7 @@
         <script src="./dev/js-calendar.js"></script>
         <script>
             JSCalendar.on('new', function(cal, xtra) {
-                log("Class level hook caught for instance with id " + cal.id)
+                _jscallog("Class level hook caught for instance with id " + cal.id)
             });
 
             var today = new Date();
