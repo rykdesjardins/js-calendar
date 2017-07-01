@@ -34,6 +34,9 @@ var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 | datasourceHeaders | Headers to be sent to the data source on every request | {} |
 | ampm | Flag, setting it to true will use 12h system, false will use 24h | true |
 | displaySeconds | Flag, setting it to true will display the seconds for the events in the calendar | false |
+| dayviewGapMinutes | Number of minutes between each block in day view | 30 |
+| dayviewNoTimeGapSize | Number of block used in day view for events without a time | 2 |
+| dayviewGapHeight | Height of a block in day view, in pixels | 38 |
 | height | Maximum height for the calendar, if it goes beyond, scroll bars are added | 700 |
 | width | Maximum width for the calendar, if it goes beyond, the rest will be hidden. This can be a percentage. | 1024 |
 
@@ -75,9 +78,10 @@ JSCalendar.on('eventName', (calendar, extra) => {
 | viewWillChange | Fired before rendering a new view (month, week, day). |
 | viewChanged | Fired after changing view. This will not fire if the view was set to the current one (wasn't changed). |
 
+## More screenshots
 
-## No conflicts with overlapping events
+### No conflicts with overlapping events
 ![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-day.jpg "Screenshot of provided demo in example.html")
 
-## Week view
+### Week view
 ![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-week.jpg "Screenshot of provided demo in example.html")
