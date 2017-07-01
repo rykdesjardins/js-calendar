@@ -25,9 +25,14 @@ It acts as a small wrapper around `document.createElement`.
 /*
   elementType : string, represents the tag name (div, span, ...)
   cssClasses : string, a space-separated list of css classes
-  parent : DOMElement, if specified, the newly created element will be appended to the parent's children elements.
+  parentElem : HTMLElement, if specified, the newly created element will be appended user the parent.
   
   The function returns the newly created element.
 */
-_a(elementType, cssClasses, parent);
+var _a = function(elementType, cssClasses, parentElem) {
+    let elem = document.createElement(elementType);
+    elem.className = cssClasses || "";
+    parentElem && parentElem.appendChild(elem);
+    return elem;
+}
 ```
