@@ -138,7 +138,7 @@ class JSCalendarEvent {
             dayElem.style.top = this.gapcell * this.options.dayviewGapHeight + "px";
             dayElem.style.right = "0px";
             dayElem.style.left = "0px";
-            dayElem.style.zIndex = Math.ceil(this.gapcell);
+            dayElem.style.zIndex = Math.floor(this.gapcell);
         } else {
 
         }
@@ -532,6 +532,9 @@ class JSCalendar {
         let smallestGap = -1;
         events.filter(e => e.at).forEach(e => {
             e.render(this.state.view, eventwrap);
+            e.ratio = 100;
+            e.dayElem.style.left = "0";
+            e.dayElem.style.right = "0";
 
             let totalgaps = e.gapcount;
             if (Math.floor(e.gapcell) != e.gapcell) {
@@ -558,8 +561,14 @@ class JSCalendar {
             let index = 0;
 
             groups[gap].forEach(e => {
-                e.dayElem.style.left = index * ratio + "%";
-                e.dayElem.style.right = ratio * (total - index - 1) + "%";
+                let minleft = index * ratio;
+                let minright = ratio * (total - index - 1);
+                
+                if (ratio < e.ratio) {
+                    e.ratio = ratio;
+                    e.dayElem.style.left = minleft + "%";
+                    e.dayElem.style.right = minright + "%";
+                }
     
                 index++;
             });
