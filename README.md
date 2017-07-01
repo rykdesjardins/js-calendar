@@ -6,6 +6,13 @@ The development files are using es2016, so I used babel with the es2015 preset a
 ## Sailor's honour
 If other kind developers want to lend a hand, I will obviously stop pushing directly to master and switch to a dev branch ;)
 
+## Installation
+Using git `git clone https://github.com/rykdesjardins/js-calendar`
+
+Using NPM `npm install --save vanilla-js-calendar`
+
+Using bower `bower install vanilla-js-calendar`
+
 ## Basic usage
 ```javascript 
 var elem = document.getElementById("myCalendar");

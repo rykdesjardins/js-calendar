@@ -1,5 +1,5 @@
 {
-  "name": "js-calendar",
+  "name": "vanilla-js-calendar",
   "version": "1.0.3",
   "description": "The lightest Javascript calendar out there, without any dependency (no jQuery).",
   "main": "dist/js-calendar.js",

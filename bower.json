@@ -1,0 +1,26 @@
+{
+  "name": "vanilla-js-calendar",
+  "description": "The lightest Javascript calendar out there, without any dependency (no jQuery).",
+  "main": "dist/js-calendar.js",
+  "authors": [
+    "Erik Desjardins"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "calendar",
+    "date",
+    "javascript",
+    "frontend",
+    "no-dependencies",
+    "vanilla-javascript",
+    "agenda"
+  ],
+  "homepage": "https://github.com/rykdesjardins/js-calendar",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
