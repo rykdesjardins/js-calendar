@@ -49,7 +49,7 @@ var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 | dayviewNoTimeGapSize | Number of block used in day view for events without a time | 2 |
 | dayviewGapHeight | Height of a block in day view, in pixels | 38 |
 | height | Maximum height for the calendar, if it goes beyond, scroll bars are added | 700 |
-| width | Maximum width for the calendar, if it goes beyond, the rest will be hidden. This can be a percentage. | 1024 |
+| width | Maximum width for the calendar, if it goes beyond, the rest will be hidden. Can also be "full" for responsive full width. | 1024 |
 
 ## Hooks
 Hooks can be used to customize certain events and alter the way data is fetched, processed and rendered. 

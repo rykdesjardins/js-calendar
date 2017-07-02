@@ -833,12 +833,17 @@ var JSCalendar = function () {
     }, {
         key: "applyCSS",
         value: function applyCSS() {
-            this.elem.style.width = this.options.width + "px";
+            if (this.options.width == "full") {
+                this.elem.style.width = "auto";
+                this.state.responsiveWidth = this.elem.getBoundingClientRect().width;
+            } else {
+                this.elem.style.width = this.options.width + "px";
+            }
 
             var cols = this.elem.querySelectorAll(".jscal-col");
             for (var i = 0; i < cols.length; i++) {
                 cols[i].style.height = this.options.height / 6 + "px";
-                cols[i].style.width = this.options.width / 7 + "px";
+                cols[i].style.width = (this.state.responsiveWidth || this.options.width) / 7 + "px";
             }
 
             this.elem.querySelector('.calendar-wrapper').style.maxHeight = this.options.height + 40 + "px";
