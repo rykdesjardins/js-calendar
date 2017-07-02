@@ -504,7 +504,7 @@ class JSCalendar {
             this.fire("rendered");
 
             _jscallog(`Rendering benchmark : ${Date.now()-benchStart}ms`);
-        });
+        }, this.options.alwaysFetch);
 
         return this;
     }
@@ -1003,11 +1003,11 @@ class JSCalendar {
                         let maybeMatrix = JSON.parse(request.responseText);
                         this.fire('fetched', maybeMatrix);
 
-                        if (this.appendMatrix(maybeMatrix)) {
+                        if (this.options.fetchReplaces ? this.setMatrix(maybeMatrix) : this.appendMatrix(maybeMatrix)) {
                             _jscallog("Updated matrix from data source")
                             done && done(undefined, maybeMatrix);
                         } else {
-                            _jscallog("Received invalid matrix with size : " + maybeMatrix.length)
+                            _jscallog("Received invalid matrix");
                             done && done(new Error("Invalid matrix size"), maybeMatrix);
                         }
                     } catch (err) {
@@ -1150,6 +1150,8 @@ class JSCalendar {
             datasourceHeaders : {},
             ampm : true,
             displaySeconds : false,
+            alwaysFetch : false,
+            fetchReplaces : false,
             height : 700,
             width : 1024
         };

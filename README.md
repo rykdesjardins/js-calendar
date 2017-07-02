@@ -47,6 +47,8 @@ var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 | displaySeconds | Flag, setting it to true will display the seconds for the events in the calendar | false |
 | dayviewGapMinutes | Number of minutes between each block in day view | 30 |
 | dayviewNoTimeGapSize | Number of block used in day view for events without a time | 2 |
+| alwaysFetch | Wether to always fetch from server or not | false |
+| fetchReplaces | Wether to replace the entire matrix after fetching, false for append | false |
 | dayviewGapHeight | Height of a block in day view, in pixels | 38 |
 | height | Maximum height for the calendar, if it goes beyond, scroll bars are added | 700 |
 | width | Maximum width for the calendar, if it goes beyond, the rest will be hidden. Can also be "full" for responsive full width. | 1024 |
