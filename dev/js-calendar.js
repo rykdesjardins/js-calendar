@@ -988,7 +988,6 @@ class JSCalendar {
             _jscallog("Loading matrix from local cache");
             done && done();
         } else if (this.options.datasource) {
-            this.fire('willFetch');
             let request = new XMLHttpRequest();
             for (let header in this.options.datasourceHeaders) {
                 request.setRequestHeader(header, this.options.datasourceHeaders[header]);
@@ -1008,6 +1007,8 @@ class JSCalendar {
                 "&day=" + this.state.day + "&view=" + this.state.view + 
                 "&startstamp=" + firstStamp + "&endstamp=" + endStamp;
 
+            let evObject = {url};
+            this.fire('willFetch', evObject);
             request.onreadystatechange = () => {
                 if (request.readyState == XMLHttpRequest.DONE && request.status == 200) {
                     try {
@@ -1032,7 +1033,7 @@ class JSCalendar {
             };
 
             _jscallog("Sending async request to data source : " + this.options.datasource);
-            request.open('GET', url);
+            request.open('GET', evObject.url);
             request.send();
         } else {
             _jscallog("Created new entry in matrix for " + this.state.year + "/" + this.state.month);
