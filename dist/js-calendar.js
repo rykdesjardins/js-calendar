@@ -557,7 +557,7 @@ var JSCalendar = function () {
                 _this4.fire("rendered");
 
                 _jscallog("Rendering benchmark : " + (Date.now() - benchStart) + "ms");
-            });
+            }, this.options.alwaysFetch);
 
             return this;
         }
@@ -720,10 +720,12 @@ var JSCalendar = function () {
 
                 var fulldate = y + "-" + m + "-" + d;
                 daycontainer.dataset.fulldate = fulldate;
+                daycontainer.dataset.at = cDay.getTime();
                 daycontainer.addEventListener('mouseenter', function () {
                     if (_this6.state.dragging) {
                         daycontainer.appendChild(_this6.state.dragged.weekElem);
                         _this6.state.newPosition = fulldate;
+                        _this6.state.newAt = cDay.getTime();
                     }
                 });
 
@@ -801,11 +803,13 @@ var JSCalendar = function () {
                     }
 
                     var fulldate = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate();
+                    td.dataset.at = date.getTime();
                     td.dataset.fulldate = fulldate;
                     td.addEventListener('mouseenter', function () {
                         if (_this7.state.dragging) {
                             td.appendChild(_this7.state.dragged.monthElem);
                             _this7.state.newPosition = td.dataset.fulldate;
+                            _this7.state.newAt = td.dataset.at;
                         }
                     });
 
@@ -926,6 +930,13 @@ var JSCalendar = function () {
                 var dayCell = this.state.matrix[oldPosObj[0]][oldPosObj[1]][oldPosObj[2]];
                 var _index = dayCell ? dayCell.indexOf(ev) : -1;
 
+                var newAt = new Date(ev.at);
+                newAt.setDate(newPosObj[2]);
+                newAt.setMonth(newPosObj[1]);
+                newAt.setFullYear(newPosObj[0]);
+
+                ev.at = newAt;
+
                 if (_index != -1) {
                     dayCell.splice(_index, 1);
                     this.validateCell(newPosObj[0], newPosObj[1], newPosObj[2]);
@@ -936,7 +947,7 @@ var JSCalendar = function () {
                     arr.push(ev);
 
                     ev.position = newPos;
-                    this.fire('cellMoved', { event: ev, oldPosition: oldPos, newPosition: newPos });
+                    this.fire('cellMoved', { event: ev, oldPosition: oldPos, newPosition: newPos, newtime: ev.at });
                 } else {
                     this.fire('cellDidNotMove', { event: ev, reason: new Error("Could not find cell in matrix") });
                 }
@@ -1075,7 +1086,6 @@ var JSCalendar = function () {
                 _jscallog("Loading matrix from local cache");
                 done && done();
             } else if (this.options.datasource) {
-                this.fire('willFetch');
                 var request = new XMLHttpRequest();
                 for (var header in this.options.datasourceHeaders) {
                     request.setRequestHeader(header, this.options.datasourceHeaders[header]);
@@ -1093,17 +1103,19 @@ var JSCalendar = function () {
                 var url = this.options.datasource;
                 url += (url.indexOf('?') != -1 ? "&" : "?") + "year=" + this.state.year + "&month=" + this.state.month + "&day=" + this.state.day + "&view=" + this.state.view + "&startstamp=" + firstStamp + "&endstamp=" + endStamp;
 
+                var evObject = { url: url };
+                this.fire('willFetch', evObject);
                 request.onreadystatechange = function () {
                     if (request.readyState == XMLHttpRequest.DONE && request.status == 200) {
                         try {
                             var maybeMatrix = JSON.parse(request.responseText);
                             _this9.fire('fetched', maybeMatrix);
 
-                            if (_this9.appendMatrix(maybeMatrix)) {
+                            if (_this9.options.fetchReplaces ? _this9.setMatrix(maybeMatrix) : _this9.appendMatrix(maybeMatrix)) {
                                 _jscallog("Updated matrix from data source");
                                 done && done(undefined, maybeMatrix);
                             } else {
-                                _jscallog("Received invalid matrix with size : " + maybeMatrix.length);
+                                _jscallog("Received invalid matrix");
                                 done && done(new Error("Invalid matrix size"), maybeMatrix);
                             }
                         } catch (err) {
@@ -1117,7 +1129,7 @@ var JSCalendar = function () {
                 };
 
                 _jscallog("Sending async request to data source : " + this.options.datasource);
-                request.open('GET', url);
+                request.open('GET', evObject.url);
                 request.send();
             } else {
                 _jscallog("Created new entry in matrix for " + this.state.year + "/" + this.state.month);
@@ -1263,6 +1275,8 @@ var JSCalendar = function () {
                 datasourceHeaders: {},
                 ampm: true,
                 displaySeconds: false,
+                alwaysFetch: false,
+                fetchReplaces: false,
                 height: 700,
                 width: 1024
             };

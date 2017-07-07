@@ -859,7 +859,7 @@ class JSCalendar {
             let newAt = new Date(ev.at);
             newAt.setDate(newPosObj[2]);
             newAt.setMonth(newPosObj[1]);
-            newAt.setFullYear(newPostObj[0]);
+            newAt.setFullYear(newPosObj[0]);
 
             ev.at = newAt;
 

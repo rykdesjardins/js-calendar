@@ -1,6 +1,6 @@
 {
   "name": "vanilla-js-calendar",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "The lightest Javascript calendar out there, without any dependency (no jQuery).",
   "main": "dist/js-calendar.js",
   "scripts": {
@@ -28,5 +28,8 @@
   "dependencies": {
     "babel-preset-es2015": "^6.24.1",
     "babili": "^0.1.4"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.24.1"
   }
 }
