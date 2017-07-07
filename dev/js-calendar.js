@@ -18,12 +18,21 @@ class JSCalendarEvent {
         if (!data) { return false; }
 
         this.setData(data);
+        this.setID(data.id);
         this.position = position;
         this.options = calendar.options;
         this.calendar = calendar;
         this.buildElements();
         this.updateElements();
         this.bindEvents();
+    }
+
+    setID(id) {
+        this.id = id;
+    }
+
+    getID() {
+        return this.id;
     }
 
     setData(data) {
