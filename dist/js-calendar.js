@@ -32,6 +32,7 @@ var JSCalendarEvent = function () {
         }
 
         this.setData(data);
+        this.setID(data.id);
         this.position = position;
         this.options = calendar.options;
         this.calendar = calendar;
@@ -41,6 +42,16 @@ var JSCalendarEvent = function () {
     }
 
     _createClass(JSCalendarEvent, [{
+        key: "setID",
+        value: function setID(id) {
+            this.id = id;
+        }
+    }, {
+        key: "getID",
+        value: function getID() {
+            return this.id;
+        }
+    }, {
         key: "setData",
         value: function setData(data) {
             this.at = data.at && new Date(data.at);
