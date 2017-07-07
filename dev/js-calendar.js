@@ -654,10 +654,12 @@ class JSCalendar {
 
             let fulldate = y + "-" + m + "-" + d;
             daycontainer.dataset.fulldate = fulldate; 
+            daycontainer.dataset.at = cDay.getTime();
             daycontainer.addEventListener('mouseenter', () => {
                 if (this.state.dragging) {
                     daycontainer.appendChild(this.state.dragged.weekElem);
                     this.state.newPosition = fulldate;
+                    this.state.newAt = cDay.getTime();
                 }
             });
 
@@ -739,11 +741,13 @@ class JSCalendar {
                 }
 
                 let fulldate = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate();
+                td.dataset.at = date.getTime();
                 td.dataset.fulldate = fulldate;
                 td.addEventListener('mouseenter', () => {
                     if (this.state.dragging) {
                         td.appendChild(this.state.dragged.monthElem);
                         this.state.newPosition = td.dataset.fulldate;
+                        this.state.newAt = td.dataset.at;
                     }
                 });
 
@@ -852,6 +856,13 @@ class JSCalendar {
             let dayCell = this.state.matrix[oldPosObj[0]][oldPosObj[1]][oldPosObj[2]];
             let index = dayCell ? dayCell.indexOf(ev) : -1;
 
+            let newAt = new Date(ev.at);
+            newAt.setDate(newPosObj[2]);
+            newAt.setMonth(newPosObj[1]);
+            newAt.setFullYear(newPostObj[0]);
+
+            ev.at = newAt;
+
             if (index != -1) {
                 dayCell.splice(index, 1);
                 this.validateCell(newPosObj[0], newPosObj[1], newPosObj[2]);
@@ -862,7 +873,7 @@ class JSCalendar {
                 arr.push(ev);
 
                 ev.position = newPos;
-                this.fire('cellMoved', {event : ev, oldPosition : oldPos, newPosition : newPos});
+                this.fire('cellMoved', {event : ev, oldPosition : oldPos, newPosition : newPos, newtime : ev.at});
             } else {
                 this.fire('cellDidNotMove', {event : ev, reason : new Error("Could not find cell in matrix")});
             }
