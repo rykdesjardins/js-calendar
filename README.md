@@ -192,4 +192,5 @@ calendar.fetch(callback, force);
 ![demoscreenshot](https://erikdesjardins.com/static/git/jscalendar-ss-day.jpg "Screenshot of provided demo in example.html")
 
 ### Week view
-![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-week.jpg "Screenshot of provided demo in example.html")
+![demoscreenshot](https://erikdesjardins.com/static/git/jscalendar-ss-week.jpg "Screenshot of provided demo in example.html")
+
