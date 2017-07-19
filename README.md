@@ -23,7 +23,7 @@ var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 ```
 
 ## Simple design and fast rendering
-![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-month.jpg "Screenshot of provided demo in example.html")
+![demoscreenshot](https://erikdesjardins.com/static/git/jscalendar-ss-month.jpg "Screenshot of provided demo in example.html")
 
 ## Options
 | Option name | Usage | Default |
@@ -189,7 +189,7 @@ calendar.fetch(callback, force);
 ## More screenshots
 
 ### No conflicts with overlapping events
-![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-day.jpg "Screenshot of provided demo in example.html")
+![demoscreenshot](https://erikdesjardins.com/static/git/jscalendar-ss-day.jpg "Screenshot of provided demo in example.html")
 
 ### Week view
 ![demoscreenshot](http://erikdesjardins.com/static/git/jscalendar-ss-week.jpg "Screenshot of provided demo in example.html")
