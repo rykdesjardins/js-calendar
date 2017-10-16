@@ -22,6 +22,9 @@ var elem = document.getElementById("myCalendar");
 var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 ```
 
+## Latest tag
+1.0.10
+
 ## Simple design and fast rendering
 ![demoscreenshot](https://erikdesjardins.com/static/git/jscalendar-ss-month.jpg "Screenshot of provided demo in example.html")
 
