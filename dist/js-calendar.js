@@ -8,11 +8,11 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-_jscallog = function _jscallog(msg) {
+function _jscallog(msg) {
     console.log("[JSCalendar - " + new Date().toLocaleTimeString() + "] " + msg);
 };
 
-_jsCalWrapper = {
+var _jsCalWrapper = {
     instances: {}
 };
 
