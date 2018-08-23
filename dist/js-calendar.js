@@ -1303,7 +1303,10 @@ var JSCalendar = function () {
 }();
 
 JSCalendar.hooks = {};
-
+window.JSCalendar = JSCalendar;
+window.JSCalendarEvent = JSCalendarEvent;
+window._jscallog = _jscallog;
+window._jsCalWrapper = _jsCalWrapper;
 exports.JSCalendar = JSCalendar;
 exports.JSCalendarEvent = JSCalendarEvent;
 
