@@ -26,10 +26,13 @@
   },
   "homepage": "https://github.com/rykdesjardins/js-calendar#readme",
   "dependencies": {
-    "babel-preset-es2015": "^6.24.1",
-    "babili": "^0.1.4"
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.24.1"
   },
   "devDependencies": {
-    "babel-preset-es2015": "^6.24.1"
+    "babel-cli": "^6.26.0",
+    "babel-minify": "^0.1.4",
+    "babelify": "^8.0.0"
   }
 }
