@@ -22,6 +22,14 @@ var elem = document.getElementById("myCalendar");
 var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 ```
 
+# CommonJS usage
+```javascript
+require('vanilla-js-calendar')
+
+var elem = document.getElementById("myCalendar");
+var calendar = new JSCalendar(elem, { /* options */ }).init().render();
+```
+
 ## Latest tag
 1.0.10
 

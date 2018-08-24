@@ -1193,10 +1193,7 @@ class JSCalendar {
 }
 JSCalendar.hooks = {};
 
-// For backwards compatability
 window.JSCalendar = JSCalendar
 window.JSCalendarEvent = JSCalendarEvent
 window._jscallog = _jscallog
 window._jsCalWrapper = _jsCalWrapper
-
-export {JSCalendar, JSCalendarEvent}
