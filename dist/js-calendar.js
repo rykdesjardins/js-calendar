@@ -1299,7 +1299,6 @@ var JSCalendar = function () {
 
 JSCalendar.hooks = {};
 
-window.JSCalendar = JSCalendar;
-window.JSCalendarEvent = JSCalendarEvent;
-window._jscallog = _jscallog;
-window._jsCalWrapper = _jsCalWrapper;
+(function () {
+    module.exports = { JSCalendar: JSCalendar, JSCalendarEvent: JSCalendarEvent };
+})(JSCalendar, JSCalendarEvent);

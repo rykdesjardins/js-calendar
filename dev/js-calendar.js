@@ -1193,7 +1193,6 @@ class JSCalendar {
 }
 JSCalendar.hooks = {};
 
-window.JSCalendar = JSCalendar
-window.JSCalendarEvent = JSCalendarEvent
-window._jscallog = _jscallog
-window._jsCalWrapper = _jsCalWrapper
+(() => {
+    module.exports = {JSCalendar, JSCalendarEvent}
+})(JSCalendar, JSCalendarEvent)
