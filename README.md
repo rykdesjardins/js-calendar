@@ -28,6 +28,7 @@ import * as LibName from "vanilla-js-calendar"
 
 var elem = document.getElementById("myCalendar");
 var JSCalendar = LibName.JSCalendar;
+var JSCalendarEvent = LibName.JSCalendarEvent;
 var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 ```
 
