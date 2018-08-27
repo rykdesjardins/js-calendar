@@ -22,11 +22,12 @@ var elem = document.getElementById("myCalendar");
 var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 ```
 
-# CommonJS usage
+# Imported Usage
 ```javascript
-require('vanilla-js-calendar')
+import * as LibName from "vanilla-js-calendar"
 
 var elem = document.getElementById("myCalendar");
+var JSCalendar = LibName.JSCalendar;
 var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 ```
 
