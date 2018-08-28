@@ -6,6 +6,8 @@ The development files are using es2016, so I used babel with the es2015 preset a
 ## Sailor's honour
 If other kind developers want to lend a hand, I will obviously stop pushing directly to master and switch to a dev branch ;)
 
+EDIT : This now has a dev branch. Thanks to @jamacon36, I will probably be maintaining this library again. 
+
 ## Installation
 ### Using git 
 `git clone https://github.com/rykdesjardins/js-calendar`
