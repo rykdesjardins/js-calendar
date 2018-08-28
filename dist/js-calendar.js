@@ -8,7 +8,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _jscallog(msg) {
+var _jscallog = function _jscallog(msg) {
     console.log("[JSCalendar - " + new Date().toLocaleTimeString() + "] " + msg);
 };
 
@@ -1299,3 +1299,6 @@ var JSCalendar = function () {
 
 JSCalendar.hooks = {};
 
+(function () {
+    module.exports = { JSCalendar: JSCalendar, JSCalendarEvent: JSCalendarEvent };
+})(JSCalendar, JSCalendarEvent);

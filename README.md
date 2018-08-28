@@ -24,6 +24,16 @@ var elem = document.getElementById("myCalendar");
 var calendar = new JSCalendar(elem, { /* options */ }).init().render();
 ```
 
+# Imported Usage
+```javascript
+import * as LibName from "vanilla-js-calendar"
+
+var elem = document.getElementById("myCalendar");
+var JSCalendar = LibName.JSCalendar;
+var JSCalendarEvent = LibName.JSCalendarEvent;
+var calendar = new JSCalendar(elem, { /* options */ }).init().render();
+```
+
 ## Latest tag
 1.0.10
 
